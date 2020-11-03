@@ -1,0 +1,29 @@
+{% extends "blank.html" %}
+{% load static %}
+
+{% block title %}WRITING MATE{% endblock %}
+
+{% block page-heading %}Your WRITING MATE{% endblock %}
+
+{% block content %}
+<table>
+	<tr>
+		<td>
+			<h2>Neuer Log-Eintrag</h2>
+			<form method="POST" class="log-form">{% csrf_token %}
+				{{ form.as_p }}
+				<button type="submit" class="save btn btn-default">Speichern</button>
+			</form>
+		</td>
+		<td>
+			<img class="icons w-50 mb-3" src="{% static 'logs/img/undraw_friends_r511.svg' %}" alt=""
+			onload="SVGInject(this)" />
+
+		</td>
+	</tr>
+</table>
+
+<br>
+
+
+{% endblock %}

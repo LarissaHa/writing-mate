@@ -1,0 +1,85 @@
+<!DOCTYPE HTML>
+<!--
+	Telephasic by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		{% load static %}
+		<title>{% block title %}Welcome{% endblock %}</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="{% static 'logs/css/main.css' %}" />
+
+		<!-- bokeh import -->
+		<link href="http://cdn.pydata.org/bokeh/release/bokeh-1.4.0.min.css" rel="stylesheet" type="text/css">
+		<link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-1.4.0.min.css" rel="stylesheet" type="text/css">
+		<script src="http://cdn.pydata.org/bokeh/release/bokeh-1.4.0.min.js"></script>
+		<script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-1.4.0.min.js"></script>
+		{{ script | safe }}
+	</head>
+	<body class="no-sidebar is-preload">
+		<div id="page-wrapper">
+
+			<!-- Header -->
+				<div id="header-wrapper">
+					<div id="header" class="container">
+
+						<!-- Logo -->
+							<h1 id="logo"><a href="/">writing mate</a></h1>
+
+						<!-- Nav -->
+							<nav id="nav">
+								<ul>
+									<li><a href="/logs/">Logs</a></li>
+									<li><a href="#">Profil</a></li>
+									<li class="break"><a href="/projects/">Projekte</a></li>
+									<li><a href="#">Stats</a></li>
+								</ul>
+							</nav>
+
+					</div>
+				</div>
+
+			<!-- Main -->
+				<div class="wrapper">
+					<div class="container" id="main">
+
+						<!-- Content -->
+							<article id="content">
+								<header>
+									<h2>{% block page-heading %}Heading{% endblock %}</h2>
+									{% block teaser %}Teaser{% endblock %}
+								</header>
+								<a href="#" class="image featured"><img src="{% static 'logs/css/images/pic06.jpg' %}" alt="" /></a>
+								{% block content %}
+
+									Content coming soon ... !
+
+								{% endblock %}
+							</article>
+					</div>
+				</div>
+
+			<!-- Footer -->
+				<div id="footer-wrapper">
+					<div id="copyright" class="container">
+						<ul class="menu">
+							<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+						</ul>
+					</div>
+				</div>
+
+		</div>
+
+		<!-- Scripts -->
+			<script src="{% static 'logs/js/jquery.min.js' %}"></script>
+			<script src="{% static 'logs/js/jquery.dropotron.min.js' %}"></script>
+			<script src="{% static 'logs/js/browser.min.js' %}"></script>
+			<script src="{% static 'logs/js/breakpoints.min.js' %}"></script>
+			<script src="{% static 'logs/js/util.js' %}"></script>
+			<script src="{% static 'logs/js/main.js' %}"></script>
+
+	</body>
+</html>
