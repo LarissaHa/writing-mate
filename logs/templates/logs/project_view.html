@@ -1,0 +1,25 @@
+{% extends "blank.html" %}
+{% load static %}
+
+{% block title %}WRITING MATE{% endblock %}
+
+{% block page-heading %}{{ project.title }}{% endblock %}
+
+{% block content %}
+<a class="btn btn-primary" href="{% url 'project_edit' slug=project.slug %}">edit project</a>
+<table>
+    <tr>
+        <td>{{ project.title }} {{ project }}
+            <ul>
+                <li>{{ project.created_at }}</li>
+                <li>{{ project.goal }} {{ project.unit }}</li>
+                <li>{{ counts }} {{ project.unit }}</li>
+                <li>{{ project.status }}</li>
+                <li>{{ project.topic }}</li>
+                <li>{{ project.type }}</li>
+                <li>{{ project.slug }}</li>
+            </ul></td>
+    </tr>
+</table>
+
+{% endblock %}

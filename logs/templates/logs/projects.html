@@ -3,21 +3,20 @@
 
 {% block title %}WRITING MATE{% endblock %}
 
-{% block page-heading %}Deine Projekte{% endblock %}
+{% block page-heading %}your projects{% endblock %}
 
 {% block content %}
+<a class="btn btn-primary" href="/projects/new/">new project</a>
 <table>
     <tr><td><b>PROJEKTE</b></td><!--<td><b>Groups</b></td>--></tr>
     {% for project in projects %}
     <tr>
         <td>{{ project.title }} {{ project }}
             <ul>
-                <li>{{ project.created_at }}</li>
-                <li>{{ project.goal }} {{ project.unit }}</li>
-                <li>{{ counts }} {{ project.unit }}</li>
                 <li>{{ project.status }}</li>
-                <li>{{ project.topic }}</li>
-                <li>{{ project.type }}</li>
+                <li>{{ counts }} {{ project.unit }} / {{ project.goal }} {{ project.unit }}</li>
+                <a class="btn btn-primary" href="{% url 'project_view' slug=project.slug %}">view project</a>
+                <a class="btn btn-primary" href="{% url 'project_edit' slug=project.slug %}">edit project</a>
             </ul></td>
     </tr>
     {% endfor %}

@@ -1,0 +1,28 @@
+{% extends "blank.html" %}
+{% load static %}
+
+{% block title %}WRITING MATE{% endblock %}
+
+{% block page-heading %}edit project{% endblock %}
+
+{% block content %}
+<table>
+	<tr>
+		<td>
+			<form method="POST" class="project-form">{% csrf_token %}
+				{{ form.as_p }}
+				<button type="submit" class="save btn btn-primary">save</button>
+			</form>
+		</td>
+		<td>
+			<img class="icons w-50 mb-3" src="{% static 'logs/img/undraw_friends_r511.svg' %}" alt=""
+			onload="SVGInject(this)" />
+
+		</td>
+	</tr>
+</table>
+
+<br>
+
+
+{% endblock %}

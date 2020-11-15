@@ -1,7 +1,7 @@
 import re
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import Log, Project, Profile
-from .forms import LogForm
+from .forms import LogForm, ProjectForm
 from bokeh.plotting import figure
 from bokeh.embed import components
 from bokeh.models import ColumnDataSource, FactorRange, BoxSelectTool
@@ -55,7 +55,19 @@ def chart(data):
 
 
 def welcome(request):
-    #profile = get_object_or_404(Profile, user=request.user)
+    # profile = get_object_or_404(Profile, user=request.user)
+    # welcome or please login --> admin
+    return render(request, 'logs/home.html')
+
+
+def profile(request):
+    user = Profile.objects.all()
+    print(user)
+    profile = get_object_or_404(Profile, user=request.user)
+    return render(request, 'logs/profile.html', {'profile': profile})
+
+
+def logs_new(request):
     if request.method == "POST":
         form = LogForm(request.POST)
         if form.is_valid():
@@ -65,20 +77,21 @@ def welcome(request):
             return redirect('/logs/') #, {'profile': profile})
     else:
         form = LogForm()
-    return render(request, 'logs/home.html', {'form': form}) #, 'profile': profile})
-    return render(
-        request,
-        'logs/home.html',
-        {'script': script, 'div': div}
-    )
-    # return render(request, 'logs/home.html')
+    return render(request, 'logs/logs_new.html', {'form': form})
 
 
-def profile(request):
-    user = Profile.objects.all()
-    print(user)
-    profile = get_object_or_404(Profile, user=request.user)
-    return render(request, 'logs/profile.html', {'profile': profile})
+def logs_edit(request, pk):
+    log = get_object_or_404(Log, pk=pk)
+    if request.method == "POST":
+        form = LogForm(request.POST, instance=log)
+        if form.is_valid():
+            log = form.save(commit=False)
+            log.user = request.user
+            log.save()
+            return redirect('/logs/') #, {'profile': profile})
+    else:
+        form = LogForm(instance=log)
+    return render(request, 'logs/logs_edit.html', {'form': form})
 
 
 def logs2(request):
@@ -97,10 +110,37 @@ def projects(request):
     return render(request, 'logs/projects.html', {'projects': projects, 'counts': counts})
 
 
-def project_detail(request, slug):
+def project_view(request, slug):
     project = get_object_or_404(Project, slug=slug, user=request.user)
     count = Log.objects.filter(project=project).aggregate(Sum('count'))
-    return render(request, 'logs/project_detail.html', {'project': project, 'count': count})
+    return render(request, 'logs/project_view.html', {'project': project, 'count': count})
+
+
+def project_new(request):
+    if request.method == "POST":
+        form = ProjectForm(request.POST)
+        if form.is_valid():
+            project = form.save(commit=False)
+            project.user = request.user
+            project.save()
+            return redirect('/projects/', slug=project.slug)  #, {'profile': profile})
+    else:
+        form = ProjectForm()
+    return render(request, 'logs/project_new.html', {'form': form})
+
+
+def project_edit(request, slug):
+    project = get_object_or_404(Project, slug=slug)
+    if request.method == "POST":
+        form = ProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            project = form.save(commit=False)
+            project.user = request.user
+            project.save()
+            return redirect('project_edit', slug=project.slug)  #, {'profile': profile})
+    else:
+        form = ProjectForm(instance=project)
+    return render(request, 'logs/project_edit.html', {'form': form})
 
 
 def stats(request, mode="days"):
