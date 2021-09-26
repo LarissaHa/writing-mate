@@ -1,4 +1,5 @@
 import re
+from django.db.models.functions.datetime import TruncWeek
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import Log, Project, Profile
 from .forms import LogForm, ProjectForm
@@ -7,9 +8,11 @@ from bokeh.embed import components
 from bokeh.models import ColumnDataSource, FactorRange, BoxSelectTool
 from bokeh.palettes import Spectral6
 from bokeh.transform import factor_cmap
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Min
 from django.db.models.functions import Extract
 import dateparser
+from datetime import datetime, timedelta
+from django.db.models.functions import TruncMonth, TruncYear, TruncWeek
 
 
 def chart(data):
@@ -147,25 +150,28 @@ def stats(request, mode="days"):
     if mode == "weeks":
         level = "Woche"
         # last 15 weeks
-        # months = Log.objects.annotate(month_stamp=Extract('time_stamp', 'month')).values_list('month_stamp', flat=True)
-        stats = Log.objects.annotate(level=Extract('date', 'week')).filter(user=request.user).values('level').order_by('date').annotate(total_count=Sum('count'))
+        last_15_weeks = datetime.now() - timedelta(weeks=15)
+        stats = Log.objects.filter(user=request.user).filter(date__gt=last_15_weeks).extra(select={'day': 'date(date)'}).annotate(week=TruncWeek('date')).values('week').annotate(sum=Sum('count'))
     elif mode == "months":
         level = "Monat"
         # last 12 months
-        stats = Log.objects.annotate(level=Extract('date', 'month')).filter(user=request.user).values('level').order_by('date').annotate(total_count=Sum('count'))
+        last_year = datetime.now() - timedelta(weeks=53)
+        stats = Log.objects.filter(user=request.user).filter(date__gt=last_year).extra(select={'day': 'date(date)'}).annotate(month=TruncMonth('date')).values('month').annotate(sum=Sum('count'))
     elif mode == "years":
         level = "Jahr"
         # everything
-        stats = Log.objects.annotate(level=Extract('date', 'year')).filter(user=request.user).values('level').order_by('date').annotate(total_count=Sum('count'))
+        stats = Log.objects.filter(user=request.user).annotate(year=TruncYear('date')).values('year').annotate(count=Sum('count'))
     else:
         level = "Tag"
         # last 30 days
-        stats = Log.objects.annotate(level=Extract('date', 'day')).filter(user=request.user).values('level').order_by('date').annotate(total_count=Sum('count'))
-    script, div = chart(stats)
+        last_month = datetime.now() - timedelta(days=30)
+        stats = Log.objects.filter(user=request.user).filter(date__gt=last_month).extra(select={'day': 'date(date)'}).values('day').annotate(sum=Sum('count'))
+    #script, div = chart(stats)
     return render(
         request,
         'logs/stats.html',
-        {'script': script, 'div': div, 'stats': stats, 'level': level}
+        #{'script': script, 'div': div, 'stats': stats, 'level': level}
+        {'stats': stats, 'level': level}
     )
 
 
