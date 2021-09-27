@@ -1,4 +1,6 @@
 import re
+from django.db.models.fields import DateTimeField
+from django.db.models.functions.datetime import TruncWeek
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import Log, Project, Profile
 from .forms import LogForm, ProjectForm
@@ -7,13 +9,16 @@ from bokeh.embed import components
 from bokeh.models import ColumnDataSource, FactorRange, BoxSelectTool
 from bokeh.palettes import Spectral6
 from bokeh.transform import factor_cmap
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Min
 from django.db.models.functions import Extract
 import dateparser
+from datetime import datetime, timedelta
+from django.db.models.functions import TruncMonth, TruncYear, TruncWeek
+from .utils import time_between
 
 
 def chart(data):
-    print(data[0])
+    #print(data[0])
     x = [(str(d["level"]), "") for d in data]
     levels = [str(d["level"]) for d in data]
     counts = tuple([d["total_count"] for d in data])
@@ -24,7 +29,7 @@ def chart(data):
     plot = figure(
         x_range=FactorRange(*x),
         plot_height=250,
-        title="Fruit Counts by Year",
+        title="Your Progress",
         toolbar_location="below",
         tools="pan,wheel_zoom,box_zoom,reset"
     )
@@ -55,9 +60,12 @@ def chart(data):
 
 
 def welcome(request):
-    # profile = get_object_or_404(Profile, user=request.user)
-    # welcome or please login --> admin
-    return render(request, 'logs/home.html')
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
+    else:
+        project = Project.objects.filter(user=request.user).latest('created_at')
+        log = Log.objects.filter(user=request.user).latest('date')
+        return render(request, 'logs/home.html', {'project': project, 'log': log})
 
 
 def profile(request):
@@ -68,6 +76,8 @@ def profile(request):
 
 
 def logs_new(request):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
     if request.method == "POST":
         form = LogForm(request.POST)
         if form.is_valid():
@@ -81,6 +91,8 @@ def logs_new(request):
 
 
 def logs_edit(request, pk):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
     log = get_object_or_404(Log, pk=pk)
     if request.method == "POST":
         form = LogForm(request.POST, instance=log)
@@ -101,22 +113,32 @@ def logs2(request):
 
 
 def projects(request):
-    projects = Project.objects.filter(user=request.user).order_by("created_at")
-    counts = {
-        p.title:
-        Log.objects.filter(project=p, user=request.user).values('project').order_by('project').aggregate(Sum('count')) for p in projects
-    }
-    print(counts)
-    return render(request, 'logs/projects.html', {'projects': projects, 'counts': counts})
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
+    temp = Project.objects.filter(user=request.user).order_by("-created_at")
+    projects = [{
+        "title": p.title,
+        "status": p.status,
+        "unit": p.unit,
+        "count": Log.objects.filter(project=p, user=request.user).aggregate(Sum('count'))["count__sum"],
+        "goal": p.goal,
+        "slug": p.slug
+    } for p in temp]
+    return render(request, 'logs/projects.html', {'projects': projects})
 
 
 def project_view(request, slug):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
     project = get_object_or_404(Project, slug=slug, user=request.user)
-    count = Log.objects.filter(project=project).aggregate(Sum('count'))
-    return render(request, 'logs/project_view.html', {'project': project, 'count': count})
+    count = Log.objects.filter(project=project, user=request.user).aggregate(Sum('count'))["count__sum"]
+    logs = Log.objects.filter(project=project, user=request.user).order_by("-date")[:5]
+    return render(request, 'logs/project_view.html', {'project': project, 'count': count, 'logs': logs})
 
 
 def project_new(request):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
     if request.method == "POST":
         form = ProjectForm(request.POST)
         if form.is_valid():
@@ -130,6 +152,8 @@ def project_new(request):
 
 
 def project_edit(request, slug):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
     project = get_object_or_404(Project, slug=slug)
     if request.method == "POST":
         form = ProjectForm(request.POST, instance=project)
@@ -144,38 +168,72 @@ def project_edit(request, slug):
 
 
 def stats(request, mode="days"):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
+    stats = []
     if mode == "weeks":
-        level = "Woche"
+        level = "Week"
         # last 15 weeks
-        # months = Log.objects.annotate(month_stamp=Extract('time_stamp', 'month')).values_list('month_stamp', flat=True)
-        stats = Log.objects.annotate(level=Extract('date', 'week')).filter(user=request.user).values('level').order_by('date').annotate(total_count=Sum('count'))
+        last_15_weeks = datetime.now() - timedelta(weeks=15)
+        for week in time_between(last_15_weeks, datetime.now(), "weekly"):
+            stats.append({"level": week.strftime('%V'), "total_count": 0})
+        temp = Log.objects.filter(user=request.user).filter(date__gt=last_15_weeks).extra(select={'day': 'date(date)'}).annotate(level=TruncWeek('date')).values('level').annotate(total_count=Sum('count'))
+        for s in stats:
+            for t in temp:
+                if s["level"] == t["level"].strftime('%V'):
+                    s["total_count"] = t["total_count"]
     elif mode == "months":
-        level = "Monat"
+        level = "Month"
         # last 12 months
-        stats = Log.objects.annotate(level=Extract('date', 'month')).filter(user=request.user).values('level').order_by('date').annotate(total_count=Sum('count'))
+        last_year = datetime.now() - timedelta(weeks=53)
+        for month in time_between(last_year, datetime.now(), "monthly"):
+            stats.append({"level": month.strftime("%B %Y"), "total_count": 0})
+        temp = Log.objects.filter(user=request.user).filter(date__gt=last_year).extra(select={'day': 'date(date)'}).annotate(level=TruncMonth('date')).values('level').annotate(total_count=Sum('count'))
+        for s in stats:
+            for t in temp:
+                if s["level"] == t["level"].strftime('%B %Y'):
+                    s["total_count"] = t["total_count"]
     elif mode == "years":
-        level = "Jahr"
+        level = "Year"
         # everything
-        stats = Log.objects.annotate(level=Extract('date', 'year')).filter(user=request.user).values('level').order_by('date').annotate(total_count=Sum('count'))
+        greatest_day = datetime.now() - timedelta(weeks=200) # greatest day in DB
+        for year in time_between(greatest_day, datetime.now(), "yearly"):
+            stats.append({"level": year.year, "total_count": 0})
+        stats.append({"level": datetime.now().year, "total_count": 0})
+        temp = Log.objects.filter(user=request.user).annotate(level=TruncYear('date')).values('level').annotate(total_count=Sum('count'))
+        for s in stats:
+            for t in temp:
+                if s["level"] == t["level"].year:
+                    s["total_count"] = t["total_count"]
     else:
-        level = "Tag"
+        level = "Day"
         # last 30 days
-        stats = Log.objects.annotate(level=Extract('date', 'day')).filter(user=request.user).values('level').order_by('date').annotate(total_count=Sum('count'))
+        last_month = datetime.now() - timedelta(days=30)
+        for day in time_between(last_month, datetime.now(), "daily"):
+            stats.append({"level": day.strftime("%d %b"), "total_count": 0})
+        temp = Log.objects.filter(user=request.user).filter(date__gt=last_month).extra(select={'level': 'date(date)'}).values('level').annotate(total_count=Sum('count'))
+        for s in stats:
+            for t in temp:
+                if s["level"] == t["level"].strftime("%d %b"):
+                    s["total_count"] = t["total_count"]
     script, div = chart(stats)
     return render(
         request,
         'logs/stats.html',
         {'script': script, 'div': div, 'stats': stats, 'level': level}
+        #{'stats': stats, 'level': level}
     )
 
 
-def logs(request):
-    print("hi")
+def logs(request, project=None):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
     data = {}
     if "GET" == request.method:
-        logs = Log.objects.filter(user=request.user).order_by("date")
-        return render(request, 'logs/logs.html', {'logs': logs})
-        # return render(request, "logs/logs.html", data)
+        if project is None:
+            logs = Log.objects.filter(user=request.user).order_by("-date")[:20]
+            return render(request, 'logs/logs.html', {'logs': logs})
+            # return render(request, "logs/logs.html", data)
     # if not GET, then proceed
     try:
         csv_file = request.FILES["csv_file"]

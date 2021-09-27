@@ -18,14 +18,6 @@
   <!-- Custom styles for this template-->
   <link href="{% static 'logs/css/sb-admin-2.min.css' %}" rel="stylesheet">
 
-  <!-- bokeh import -->
-  <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-2.2.3.min.js" integrity="sha384-T2yuo9Oe71Cz/I4X9Ac5+gpEa5a8PpJCDlqKYO0CfAuEszu1JrXLl8YugMqYe3sM" crossorigin="anonymous"></script>
-  <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.2.3.min.js" integrity="sha384-98GDGJ0kOMCUMUePhksaQ/GYgB3+NH9h996V88sh3aOiUNX3N+fLXAtry6xctSZ6" crossorigin="anonymous"></script>
-  <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.2.3.min.js" integrity="sha384-89bArO+nlbP3sgakeHjCo1JYxYR5wufVgA3IbUvDY+K7w4zyxJqssu7wVnfeKCq8" crossorigin="anonymous"></script>
-  <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.2.3.min.js" integrity="sha384-eT3dNscgjXmsGsM0ZO+nTwoL2BpJeNQnXH8gmXJmnEjqTb0ZV7c3jJ27FFe/oh1N" crossorigin="anonymous"></script>
-  
-  {{ script | safe }}
-
 </head>
 
 <body id="page-top">
@@ -267,13 +259,15 @@
             <div class="topbar-divider d-none d-sm-block"></div>
 
             <!-- Nav Item - User Information -->
+            {% if user.is_authenticated %}
             <li class="nav-item dropdown no-arrow">
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ profile.user.name }}</span>
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ user.username }}</span>
                 <img class="img-profile rounded-circle" src="{% block user_image %}https://source.unsplash.com/QAB-WJcbgJk/60x60{% endblock %}"">
               </a>
               <!-- Dropdown - User Information -->
               <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                <!--
                 <a class="dropdown-item" href="/profile/">
                   <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                   Profile
@@ -287,12 +281,18 @@
                   Activity Log
                 </a>
                 <div class="dropdown-divider"></div>
+                -->
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                   <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                   Logout
                 </a>
               </div>
             </li>
+            {% else %}
+            <li class="nav-item dropdown no-arrow">
+              <span class="mr-2 d-none d-lg-inline text-gray-600 small"><a href="{% url 'login' %}">Log In</a></span>
+            </li>
+            {% endif %}
 
           </ul>
 
@@ -349,7 +349,7 @@
         <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
         <div class="modal-footer">
           <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-          <a class="btn btn-primary" href="login.html">Logout</a>
+          <a class="btn btn-primary" href="{% url 'logout' %}">Logout</a>
         </div>
       </div>
     </div>

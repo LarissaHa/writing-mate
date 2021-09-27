@@ -7,7 +7,32 @@
 
 {% block content %}
 
-Welcome or login
+{% if user.is_authenticated %}
+  <p>Welcome {{ user.username }} :)</p>
+  <br>
+  <br>
+<table>
+    <tr>
+        <td>
+            <img class="icons w-50 mb-3" src="{% static 'logs/img/undraw_friends_r511.svg' %}" alt=""
+			onload="SVGInject(this)" />
+        </td>
+        <td>
+            <p>Start now: <br><a class="btn btn-secondary" href="/projects/new/">New Project</a></p>
+            <p>Continue your work: <br><a class="btn btn-secondary" href="/logs/new/">New Log</a></p>
+            <p>Your newest project: <br><a class="btn btn-secondary" href="{% url 'project_view' slug=project.slug %}">{{ project.title }}</a></p>
+            <p>Your latest log entry: <br>{{ log.project }} - {{ log.count }} - {{ log.date }}, {{ log.time }} - {{ log.note }}</p>
+        </td>
+    </tr>
+</table>
+
+  <br>
+  <br>
+  <a class="btn btn-primary" href="#" data-toggle="modal" data-target="#logoutModal">Log Out</a>
+{% else %}
+  <p>You are not logged in</p>
+  <a class="btn btn-primary" href="{% url 'login' %}">Log In</a>
+{% endif %}
 
 
 {% endblock %}
