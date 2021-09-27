@@ -60,9 +60,12 @@ def chart(data):
 
 
 def welcome(request):
-    # profile = get_object_or_404(Profile, user=request.user)
-    # welcome or please login --> admin
-    return render(request, 'logs/home.html')
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
+    else:
+        project = Project.objects.filter(user=request.user).latest('created_at')
+        log = Log.objects.filter(user=request.user).latest('date')
+        return render(request, 'logs/home.html', {'project': project, 'log': log})
 
 
 def profile(request):
@@ -73,6 +76,8 @@ def profile(request):
 
 
 def logs_new(request):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
     if request.method == "POST":
         form = LogForm(request.POST)
         if form.is_valid():
@@ -86,6 +91,8 @@ def logs_new(request):
 
 
 def logs_edit(request, pk):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
     log = get_object_or_404(Log, pk=pk)
     if request.method == "POST":
         form = LogForm(request.POST, instance=log)
@@ -106,7 +113,9 @@ def logs2(request):
 
 
 def projects(request):
-    temp = Project.objects.filter(user=request.user).order_by("created_at")
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
+    temp = Project.objects.filter(user=request.user).order_by("-created_at")
     projects = [{
         "title": p.title,
         "status": p.status,
@@ -119,6 +128,8 @@ def projects(request):
 
 
 def project_view(request, slug):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
     project = get_object_or_404(Project, slug=slug, user=request.user)
     count = Log.objects.filter(project=project, user=request.user).aggregate(Sum('count'))["count__sum"]
     logs = Log.objects.filter(project=project, user=request.user).order_by("-date")[:5]
@@ -126,6 +137,8 @@ def project_view(request, slug):
 
 
 def project_new(request):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
     if request.method == "POST":
         form = ProjectForm(request.POST)
         if form.is_valid():
@@ -139,6 +152,8 @@ def project_new(request):
 
 
 def project_edit(request, slug):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
     project = get_object_or_404(Project, slug=slug)
     if request.method == "POST":
         form = ProjectForm(request.POST, instance=project)
@@ -153,6 +168,8 @@ def project_edit(request, slug):
 
 
 def stats(request, mode="days"):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
     stats = []
     if mode == "weeks":
         level = "Week"
@@ -209,7 +226,8 @@ def stats(request, mode="days"):
 
 
 def logs(request, project=None):
-    print("hi")
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
     data = {}
     if "GET" == request.method:
         if project is None:
