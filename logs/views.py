@@ -12,8 +12,9 @@ from bokeh.transform import factor_cmap
 from django.db.models import Sum, Count, Min
 from django.db.models.functions import Extract
 import dateparser
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from django.db.models.functions import TruncMonth, TruncYear, TruncWeek
+from .utils import time_between
 
 
 def chart(data):
@@ -105,19 +106,23 @@ def logs2(request):
 
 
 def projects(request):
-    projects = Project.objects.filter(user=request.user).order_by("created_at")
-    counts = {
-        p.title:
-        Log.objects.filter(project=p, user=request.user).values('project').order_by('project').aggregate(Sum('count')) for p in projects
-    }
-    print(counts)
-    return render(request, 'logs/projects.html', {'projects': projects, 'counts': counts})
+    temp = Project.objects.filter(user=request.user).order_by("created_at")
+    projects = [{
+        "title": p.title,
+        "status": p.status,
+        "unit": p.unit,
+        "count": Log.objects.filter(project=p, user=request.user).aggregate(Sum('count'))["count__sum"],
+        "goal": p.goal,
+        "slug": p.slug
+    } for p in temp]
+    return render(request, 'logs/projects.html', {'projects': projects})
 
 
 def project_view(request, slug):
     project = get_object_or_404(Project, slug=slug, user=request.user)
-    count = Log.objects.filter(project=project).aggregate(Sum('count'))
-    return render(request, 'logs/project_view.html', {'project': project, 'count': count})
+    count = Log.objects.filter(project=project, user=request.user).aggregate(Sum('count'))["count__sum"]
+    logs = Log.objects.filter(project=project, user=request.user).order_by("-date")[:5]
+    return render(request, 'logs/project_view.html', {'project': project, 'count': count, 'logs': logs})
 
 
 def project_new(request):
@@ -146,34 +151,25 @@ def project_edit(request, slug):
         form = ProjectForm(instance=project)
     return render(request, 'logs/project_edit.html', {'form': form})
 
-def months_between(start_date, end_date):
-    if start_date > end_date:
-        raise ValueError(f"Start date {start_date} is not before end date {end_date}")
-    year = start_date.year
-    month = start_date.month
-    while (year, month) <= (end_date.year, end_date.month):
-        yield date(year, month, 1)
-        if month == 12:
-            month = 1
-            year += 1
-        else:
-            month += 1
 
 def stats(request, mode="days"):
     stats = []
     if mode == "weeks":
-        level = "Woche"
+        level = "Week"
         # last 15 weeks
         last_15_weeks = datetime.now() - timedelta(weeks=15)
-
-        stats = Log.objects.filter(user=request.user).filter(date__gt=last_15_weeks).extra(select={'day': 'date(date)'}).annotate(level=TruncWeek('date')).values('level').annotate(total_count=Sum('count'))
+        for week in time_between(last_15_weeks, datetime.now(), "weekly"):
+            stats.append({"level": week.strftime('%V'), "total_count": 0})
+        temp = Log.objects.filter(user=request.user).filter(date__gt=last_15_weeks).extra(select={'day': 'date(date)'}).annotate(level=TruncWeek('date')).values('level').annotate(total_count=Sum('count'))
         for s in stats:
-            s["level"] = s["level"].strftime('%V')
+            for t in temp:
+                if s["level"] == t["level"].strftime('%V'):
+                    s["total_count"] = t["total_count"]
     elif mode == "months":
-        level = "Monat"
+        level = "Month"
         # last 12 months
         last_year = datetime.now() - timedelta(weeks=53)
-        for month in months_between(last_year, datetime.now()):
+        for month in time_between(last_year, datetime.now(), "monthly"):
             stats.append({"level": month.strftime("%B %Y"), "total_count": 0})
         temp = Log.objects.filter(user=request.user).filter(date__gt=last_year).extra(select={'day': 'date(date)'}).annotate(level=TruncMonth('date')).values('level').annotate(total_count=Sum('count'))
         for s in stats:
@@ -181,16 +177,28 @@ def stats(request, mode="days"):
                 if s["level"] == t["level"].strftime('%B %Y'):
                     s["total_count"] = t["total_count"]
     elif mode == "years":
-        level = "Jahr"
+        level = "Year"
         # everything
-        stats = Log.objects.filter(user=request.user).annotate(level=TruncYear('date')).values('level').annotate(total_count=Sum('count'))
+        greatest_day = datetime.now() - timedelta(weeks=200) # greatest day in DB
+        for year in time_between(greatest_day, datetime.now(), "yearly"):
+            stats.append({"level": year.year, "total_count": 0})
+        stats.append({"level": datetime.now().year, "total_count": 0})
+        temp = Log.objects.filter(user=request.user).annotate(level=TruncYear('date')).values('level').annotate(total_count=Sum('count'))
         for s in stats:
-            s["level"] = s["level"].year
+            for t in temp:
+                if s["level"] == t["level"].year:
+                    s["total_count"] = t["total_count"]
     else:
-        level = "Tag"
+        level = "Day"
         # last 30 days
         last_month = datetime.now() - timedelta(days=30)
-        stats = Log.objects.filter(user=request.user).filter(date__gt=last_month).extra(select={'level': 'date(date)'}).values('level').annotate(total_count=Sum('count'))
+        for day in time_between(last_month, datetime.now(), "daily"):
+            stats.append({"level": day.strftime("%d %b"), "total_count": 0})
+        temp = Log.objects.filter(user=request.user).filter(date__gt=last_month).extra(select={'level': 'date(date)'}).values('level').annotate(total_count=Sum('count'))
+        for s in stats:
+            for t in temp:
+                if s["level"] == t["level"].strftime("%d %b"):
+                    s["total_count"] = t["total_count"]
     script, div = chart(stats)
     return render(
         request,
@@ -200,13 +208,14 @@ def stats(request, mode="days"):
     )
 
 
-def logs(request):
+def logs(request, project=None):
     print("hi")
     data = {}
     if "GET" == request.method:
-        logs = Log.objects.filter(user=request.user).order_by("date")
-        return render(request, 'logs/logs.html', {'logs': logs})
-        # return render(request, "logs/logs.html", data)
+        if project is None:
+            logs = Log.objects.filter(user=request.user).order_by("-date")[:20]
+            return render(request, 'logs/logs.html', {'logs': logs})
+            # return render(request, "logs/logs.html", data)
     # if not GET, then proceed
     try:
         csv_file = request.FILES["csv_file"]

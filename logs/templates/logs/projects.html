@@ -11,10 +11,10 @@
     <tr><td><b>PROJEKTE</b></td><!--<td><b>Groups</b></td>--></tr>
     {% for project in projects %}
     <tr>
-        <td>{{ project.title }} {{ project }}
+        <td>{{ project.title }}
             <ul>
                 <li>{{ project.status }}</li>
-                <li>{{ counts }} {{ project.unit }} / {{ project.goal }} {{ project.unit }}</li>
+                <li>{{ project.count }} {{ project.unit }} / {{ project.goal }} {{ project.unit }}</li>
                 <a class="btn btn-primary" href="{% url 'project_view' slug=project.slug %}">view project</a>
                 <a class="btn btn-primary" href="{% url 'project_edit' slug=project.slug %}">edit project</a>
             </ul></td>

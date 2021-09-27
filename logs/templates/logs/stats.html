@@ -17,18 +17,18 @@
       <a class="dropdown-item" href="/stats/years/">nach Jahren</a>
     </div>
   </div>
-  {{ stats }}
-  <table>
-    <tr><td><b>{{ level }}</b></td><td><b>Count</b></td></tr>
-    {% for s in stats %}
-    <tr>
-        <td>{{ s.level }}</td>
-        <td>{{ s.total_count }}</td>
-    </tr>
-    {% endfor %}
-</table>
 
 {{ div | safe }}
+
+<table>
+  <tr><td><b>{{ level }}</b></td><td><b>Count</b></td></tr>
+  {% for s in stats %}
+  <tr>
+      <td>{{ s.level }}</td>
+      <td>{{ s.total_count }}</td>
+  </tr>
+  {% endfor %}
+</table>
 
           <!-- Content Row -->
           <div class="row">
