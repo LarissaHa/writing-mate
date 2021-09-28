@@ -7,26 +7,29 @@
 
 {% block content %}
 <div class="dropdown mb-4">
-    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      filter by project
+    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      {{ filtered_by }}
     </button>
     <div class="dropdown-menu animated--fade-in" aria-labelledby="dropdownMenuButton">
+      <a class="dropdown-item" href="{% url 'logs' %}"><i class="fa fa-times" aria-hidden="true"></i>  clear filter</a>
       {% for p in projects %}
       <a class="dropdown-item" href="{% url 'logs_filter' slug=p.slug %}">{{ p.title }}</a>
       {% endfor %}
     </div>
-  </div>
+</div>
 
-<a class="btn btn-primary" href="/logs/new/">new log</a>
+<a class="btn btn-info" href="/logs/new/">new log</a>
+<br>
+<br>
 <table>
     <tr><td><b>LOGS</b></td><!--<td><b>Groups</b></td>--></tr>
     {% for log in logs %}
     <tr>
-        <td><a class="btn btn-secondary" href="{% url 'logs_edit' pk=log.pk %}">edit</a> {{ log.project }} - {{ log.count }} - {{ log.date }}, {{ log.time }} - {{ log.note }}</td>
+        <td style="padding: 15px;"><a class="btn btn-outline-info" href="{% url 'logs_edit' pk=log.pk %}">edit</a></td><td> {{ log.project }} - {{ log.count }} - {{ log.date }}, {{ log.time }} - {{ log.note }}</td>
     </tr>
     {% endfor %}
 </table>
-
+<br><br>
 <form action="{% url 'logs' %}" method="POST" enctype="multipart/form-data" class="form-horizontal"> 
     {% csrf_token %}
     <div class="form-group">

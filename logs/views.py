@@ -242,11 +242,13 @@ def logs(request, slug=None):
     if "GET" == request.method:
         if slug is None:
             logs = Log.objects.filter(user=request.user).order_by("-date")[:20]
-            return render(request, 'logs/logs.html', {'logs': logs, 'projects': projects})
+            filtered_by = "filter by project"
+            return render(request, 'logs/logs.html', {'logs': logs, 'projects': projects, 'filtered_by': filtered_by})
         else:
             project = get_object_or_404(Project, slug=slug, user=request.user)
+            filtered_by = project.title
             logs = Log.objects.filter(project=project, user=request.user).order_by("-date")[:20]
-            return render(request, 'logs/logs.html', {'logs': logs, 'projects': projects})
+            return render(request, 'logs/logs.html', {'logs': logs, 'projects': projects, 'filtered_by': filtered_by})
             # return render(request, "logs/logs.html", data)
     # if not GET, then proceed
     try:

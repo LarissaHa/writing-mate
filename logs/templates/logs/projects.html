@@ -6,26 +6,55 @@
 {% block page-heading %}your projects{% endblock %}
 
 {% block content %}
-<a class="btn btn-primary" href="/projects/new/">new project</a>
-<table>
-    <tr><td><b>PROJEKTE</b></td><!--<td><b>Groups</b></td>--></tr>
-    {% for project in projects %}
-    <tr>
-        <td>{{ project.title }}
-            <ul>
-                <li>{{ project.status }}</li>
-                <li>{{ project.count }} {{ project.unit }} / {{ project.goal }} {{ project.unit }}</li>
-                <div class="progress">
-                    <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"
-                    aria-valuenow="{{ project.progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ project.progress }}">
-                    {{ project.progress }} complete
-                    </div>
+<div class="dropdown mb-4">
+    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      sort by
+    </button>
+    <div class="dropdown-menu animated--fade-in" aria-labelledby="dropdownMenuButton">
+      <a class="dropdown-item" href="/projects/"><i class="fa fa-times" aria-hidden="true"></i>  clear sorting</a>
+      <a class="dropdown-item" href="#">log - latest first</a>
+      <a class="dropdown-item" href="#">date - newest first</a>
+      <a class="dropdown-item" href="#">date - oldest first</a>
+      <a class="dropdown-item" href="#">progress - least first</a>
+      <a class="dropdown-item" href="#">progress - most first</a>
+      <a class="dropdown-item" href="#">date - oldest first</a>
+    </div>
+</div>
+<a class="btn btn-warning" href="/projects/new/">new project</a>
+<br><br>
+{% for project in projects %}
+<div class="card shadow mb-4">
+    <!-- Card Header - Dropdown -->
+    <div
+        class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary"><a href="{% url 'project_view' slug=project.slug %}">{{ project.title }}</a></h6>
+        <div class="dropdown no-arrow">
+            <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                aria-labelledby="dropdownMenuLink">
+                <a class="dropdown-item" href="{% url 'project_edit' slug=project.slug %}">edit project</a>
+            </div>
+        </div>
+    </div>
+    <!-- Card Body -->
+    <div class="card-body">
+        Synopsis tbd
+        <br>
+        <ul>
+            <li>{{ project.status }}</li>
+            <li>{{ project.count }} {{ project.unit }} / {{ project.goal }} {{ project.unit }}</li>
+            <div class="progress">
+                <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"
+                aria-valuenow="{{ project.progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ project.progress }}">
+                {{ project.progress }} complete
                 </div>
-                <br>
-                <a class="btn btn-primary" href="{% url 'project_view' slug=project.slug %}">view project</a>
-                <a class="btn btn-primary" href="{% url 'project_edit' slug=project.slug %}">edit project</a>
-            </ul></td>
-    </tr>
-    {% endfor %}
-</table>
+            </div>
+        </ul>
+    </div>
+</div>
+{% endfor %}
+
 {% endblock %}
