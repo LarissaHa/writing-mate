@@ -15,6 +15,13 @@
             <ul>
                 <li>{{ project.status }}</li>
                 <li>{{ project.count }} {{ project.unit }} / {{ project.goal }} {{ project.unit }}</li>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"
+                    aria-valuenow="{{ project.progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ project.progress }}">
+                    {{ project.progress }} complete
+                    </div>
+                </div>
+                <br>
                 <a class="btn btn-primary" href="{% url 'project_view' slug=project.slug %}">view project</a>
                 <a class="btn btn-primary" href="{% url 'project_edit' slug=project.slug %}">edit project</a>
             </ul></td>

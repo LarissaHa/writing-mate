@@ -22,6 +22,13 @@
     </tr>
 </table>
 
+<div class="progress">
+    <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"
+    aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ progress }}">
+    {{ progress }} complete
+    </div>
+</div>
+
 <table>
     <tr><td><b>LOGS</b></td><!--<td><b>Groups</b></td>--></tr>
     {% for log in logs %}
