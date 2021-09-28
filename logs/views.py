@@ -225,14 +225,18 @@ def stats(request, mode="days"):
     )
 
 
-def logs(request, project=None):
+def logs(request, slug=None):
     if request.user.is_anonymous:
         return render(request, 'logs/home.html')
-    data = {}
+    projects = Project.objects.filter(user=request.user).order_by("-created_at")
     if "GET" == request.method:
-        if project is None:
+        if slug is None:
             logs = Log.objects.filter(user=request.user).order_by("-date")[:20]
-            return render(request, 'logs/logs.html', {'logs': logs})
+            return render(request, 'logs/logs.html', {'logs': logs, 'projects': projects})
+        else:
+            project = get_object_or_404(Project, slug=slug, user=request.user)
+            logs = Log.objects.filter(project=project, user=request.user).order_by("-date")[:20]
+            return render(request, 'logs/logs.html', {'logs': logs, 'projects': projects})
             # return render(request, "logs/logs.html", data)
     # if not GET, then proceed
     try:

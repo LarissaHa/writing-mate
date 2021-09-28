@@ -6,6 +6,17 @@
 {% block page-heading %}your log overview{% endblock %}
 
 {% block content %}
+<div class="dropdown mb-4">
+    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      filter by project
+    </button>
+    <div class="dropdown-menu animated--fade-in" aria-labelledby="dropdownMenuButton">
+      {% for p in projects %}
+      <a class="dropdown-item" href="{% url 'logs_filter' slug=p.slug %}">{{ p.title }}</a>
+      {% endfor %}
+    </div>
+  </div>
+
 <a class="btn btn-primary" href="/logs/new/">new log</a>
 <table>
     <tr><td><b>LOGS</b></td><!--<td><b>Groups</b></td>--></tr>
