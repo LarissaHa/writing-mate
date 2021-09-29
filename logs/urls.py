@@ -15,7 +15,8 @@ urlpatterns = [
     path('projects/<str:slug>/edit', views.project_edit, name='project_edit'),
     path('stats/<str:mode>/', views.stats, name='stats'),
     path('stats/', views.stats, name='stats'),
-    #path('register/', views.register, name='register'),
-    #path('logout', views.logout_request, name='logout'),
+    path('imprint/', views.imprint, name='imprint'),
+    path('contact/', views.contact, name='contact'),
+    path('accounts/register/', views.register, name='register'),
     # path('upload/csv/', views.upload_csv, name='upload_csv'),
 ]

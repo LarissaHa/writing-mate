@@ -60,6 +60,18 @@ def chart(data):
     return script, div
 
 
+def contact(request):
+    return render(request, 'logs/contact.html')
+
+
+def imprint(request):
+    return render(request, 'logs/imprint.html')
+
+
+def register(request):
+    return render(request, 'registration/register.html')
+
+
 def welcome(request):
     if request.user.is_anonymous:
         return render(request, 'logs/home.html')
