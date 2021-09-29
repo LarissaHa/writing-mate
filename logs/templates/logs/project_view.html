@@ -6,29 +6,127 @@
 {% block page-heading %}{{ project.title }}{% endblock %}
 
 {% block content %}
-<a class="btn btn-primary" href="{% url 'project_edit' slug=project.slug %}">edit project</a>
-<table>
-    <tr>
-        <td>{{ project.title }} {{ project }}
-            <ul>
-                <li>{{ project.created_at }}</li>
-                <li>{{ project.goal }} {{ project.unit }}</li>
-                <li>{{ count }} {{ project.unit }}</li>
-                <li>{{ project.status }}</li>
-                <li>{{ project.topic }}</li>
-                <li>{{ project.type }}</li>
-                <li>{{ project.slug }}</li>
-            </ul></td>
-    </tr>
-</table>
+created at {{ project.created_at }}
+<br>
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            {{ project.unit }}</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ count }} / {{ project.goal }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-pen-nib fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Progress
+                        </div>
+                        <div class="row no-gutters align-items-center">
+                            <div class="col-auto">
+                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ progress }}</div>
+                            </div>
+                            <div class="col">
+                                <div class="progress progress-sm mr-2">
+                                    <div class="progress-bar bg-primary" role="progressbar"
+                                        style="width: {{ progress }}" aria-valuenow="{{ progress }}" aria-valuemin="0"
+                                        aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-quote-right fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            about your project</div>
+                        <div class="h7 mb-0 font-weight-bold text-gray-800">
+                            <ul>
+                                <li>{{ project.status }}</li>
+                                <li>{{ project.topic }}</li>
+                                <li>{{ project.type }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Number of logs</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                        <br>
+                        <a class="btn btn-info" href="/logs/new/">new log</a>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-folder-open fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+<div class="progress">
+    <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"
+    aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ progress }}">
+    {{ progress }} complete
+    </div>
+</div>
+<br>
+<br>
+Synopsis tbd
+<br>
+<br>
+<a class="btn btn-outline-warning" href="{% url 'project_edit' slug=project.slug %}">edit project</a>
+<br>
+<br>
+<div class="card shadow mb-4">
+    <!-- Card Header - Accordion -->
+    <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse"
+        role="button" aria-expanded="true" aria-controls="collapseCardExample">
+        <h6 class="m-0 font-weight-bold text-primary">logs</h6>
+    </a>
+    <!-- Card Content - Collapse -->
+    <div class="collapse show" id="collapseCardExample">
+        <div class="card-body">
+            <table>
+                {% for log in logs %}
+                <tr>
+                    <td style="padding: 15px;"><a class="btn btn-outline-info" href="{% url 'logs_edit' pk=log.pk %}">edit</a></td><td> {{ log.project }} - {{ log.count }} - {{ log.date }}, {{ log.time }} - {{ log.note }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
 
-<table>
-    <tr><td><b>LOGS</b></td><!--<td><b>Groups</b></td>--></tr>
-    {% for log in logs %}
-    <tr>
-        <td><a class="btn btn-secondary" href="{% url 'logs_edit' pk=log.pk %}">edit</a> {{ log.project }} - {{ log.count }} - {{ log.date }}, {{ log.time }} - {{ log.note }}</td>
-    </tr>
-    {% endfor %}
-</table>
 
 {% endblock %}

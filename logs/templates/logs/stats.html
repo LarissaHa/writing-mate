@@ -3,86 +3,76 @@
 
 {% block title %}WRITING MATE{% endblock %}
 
-{% block page-heading %}Statistiken{% endblock %}
+{% block page-heading %}statistics{% endblock %}
 
 {% block content %}
 <div class="dropdown mb-4">
     <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Ansicht wechseln
+      change stats level
     </button>
     <div class="dropdown-menu animated--fade-in" aria-labelledby="dropdownMenuButton">
-      <a class="dropdown-item" href="/stats/">nach Tagen</a>
-      <a class="dropdown-item" href="/stats/weeks/">nach Wochen</a>
-      <a class="dropdown-item" href="/stats/months/">nach Monaten</a>
-      <a class="dropdown-item" href="/stats/years/">nach Jahren</a>
+      <a class="dropdown-item" href="/stats/">by days</a>
+      <a class="dropdown-item" href="/stats/weeks/">by weeks</a>
+      <a class="dropdown-item" href="/stats/months/">by months</a>
+      <a class="dropdown-item" href="/stats/years/">by years</a>
     </div>
   </div>
-
-{{ div | safe }}
-
-<table>
-  <tr><td><b>{{ level }}</b></td><td><b>Count</b></td></tr>
-  {% for s in stats %}
-  <tr>
-      <td>{{ s.level }}</td>
-      <td>{{ s.total_count }}</td>
-  </tr>
-  {% endfor %}
-</table>
-
-          <!-- Content Row -->
-          <div class="row">
-
-            <div class="col-xl-8 col-lg-7">
-
-              <!-- Area Chart -->
-              <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Area Chart</h6>
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card mb-4 py-3 border-bottom-primary">
+        <div class="card-body">
+          {{ div | safe }}
+        </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6 mb-4">
+    <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card-body">
+            <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                        you've written on</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ metrics.written_on_days }} days</div>
+                    <br>
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                      a total of</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ metrics.total_count }} words</div>
+                    <br>
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                      in a total of </div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ metrics.total_logs }} logs</div>
                 </div>
-                <div class="card-body">
-                  <div class="chart-area">
-                    {{ div | safe }}
-                  </div>
-                  <hr>
-                  Styling for the area chart can be found in the <code>/js/demo/chart-area-demo.js</code> file.
+                <div class="col-auto">
+                    <i class="fas fa-pen-nib fa-2x text-gray-300"></i>
                 </div>
-              </div>
-
-              <!-- Bar Chart -->
-              <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Bar Chart</h6>
-                </div>
-                <div class="card-body">
-                  <div class="chart-bar">
-                    <canvas id="myBarChart"></canvas>
-                  </div>
-                  <hr>
-                  Styling for the bar chart can be found in the <code>/js/demo/chart-bar-demo.js</code> file.
-                </div>
-              </div>
-
             </div>
+        </div>
+    </div>
+  </div>
+</div>
+<div class="card shadow mb-4">
+  <!-- Card Header - Accordion -->
+  <a href="#collapseCardExample" class="d-block card-header py-3 collapsed" data-toggle="collapse"
+      role="button" aria-expanded="false" aria-controls="collapseCardExample">
+      <h6 class="m-0 font-weight-bold text-primary">detailed counts</h6>
+  </a>
+  <!-- Card Content - Collapse -->
+  <div class="collapse" id="collapseCardExample">
+      <div class="card-body">
+        <table>
+          <tr><td><b>{{ level }}</b></td><td><b>Count</b></td></tr>
+          {% for s in stats %}
+          <tr>
+              <td>{{ s.level }}</td>
+              <td>{{ s.total_count }}</td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+  </div>
+</div>
 
-            <!-- Donut Chart -->
-            <div class="col-xl-4 col-lg-5">
-              <div class="card shadow mb-4">
-                <!-- Card Header - Dropdown -->
-                <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Donut Chart</h6>
-                </div>
-                <!-- Card Body -->
-                <div class="card-body">
-                  <div class="chart-pie pt-4">
-                    <canvas id="myPieChart"></canvas>
-                  </div>
-                  <hr>
-                  Styling for the donut chart can be found in the <code>/js/demo/chart-pie-demo.js</code> file.
-                </div>
-              </div>
-            </div>
-          </div>
+
 
 <!-- bokeh import -->
 <script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.4.0.min.js" crossorigin="anonymous"></script>
