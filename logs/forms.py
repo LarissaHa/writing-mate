@@ -13,4 +13,17 @@ class ProjectForm(forms.ModelForm):
 
     class Meta:
         model = Project
-        fields = ('title', 'slug', 'goal', 'unit', 'status', 'topic', 'type')
+        fields = (
+            'title', 
+            'subtitle', 
+            'slug', 
+            'goal', 
+            'unit', 
+            'status', 
+            'topic', 
+            'type', 
+            'synopsis', 
+            'excerpt', 
+            'pinterest', 
+            'spotify'
+        )

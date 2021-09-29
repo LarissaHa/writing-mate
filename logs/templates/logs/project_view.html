@@ -6,8 +6,10 @@
 {% block page-heading %}{{ project.title }}{% endblock %}
 
 {% block content %}
+<h5>{{ project.subtitle }}</h5>
 created at {{ project.created_at }}
 <br>
+<div class="container-fluid">
 <div class="row">
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="card border-left-primary shadow h-100 py-2">
@@ -102,9 +104,35 @@ created at {{ project.created_at }}
 </div>
 <br>
 <br>
-Synopsis tbd
-<br>
-<br>
+<div class="row">
+    <div class="col-lg-6">
+        <!-- Default Card Example -->
+        <div class="card mb-4">
+            <div class="card-header">
+                synopsis
+            </div>
+            <div class="card-body">
+                <p>{{ project.synopsis }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                excerpt
+            </div>
+            <div class="card-body">
+                <p>{{ project.excerpt }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<a href="{{ project.spotify }}" target="_blank" class="btn btn-primary btn-lg btn-circle">
+    <i class="fab fa-spotify"></i>
+</a>
+<a href="{{ project.pinterest }}" target="_blank" class="btn btn-primary btn-lg btn-circle">
+    <i class="fab fa-pinterest-p"></i>
+</a>
 <a class="btn btn-outline-warning" href="{% url 'project_edit' slug=project.slug %}">edit project</a>
 <br>
 <br>
@@ -127,6 +155,6 @@ Synopsis tbd
         </div>
     </div>
 </div>
-
+</div>
 
 {% endblock %}
