@@ -7,7 +7,8 @@ from .forms import LogForm, ProjectForm
 from bokeh.plotting import figure
 from bokeh.embed import components
 from bokeh.models import ColumnDataSource, FactorRange, BoxSelectTool
-from bokeh.palettes import Spectral6
+from bokeh.palettes import Spectral6, magma
+from bokeh.models import LinearColorMapper
 from bokeh.transform import factor_cmap
 from django.db.models import Sum, Count, Min
 from django.db.models.functions import Extract
@@ -23,9 +24,6 @@ def chart(data):
     levels = [str(d["level"]) for d in data]
     counts = tuple([d["total_count"] for d in data])
 
-    years = ['2015', '2016', '2017']
-
-    source = ColumnDataSource(data=dict(x=x, counts=counts))
     plot = figure(
         x_range=FactorRange(*x),
         plot_height=250,
@@ -35,19 +33,14 @@ def chart(data):
     )
     plot.add_tools(BoxSelectTool(dimensions="width"))
     # plot.add_tools(WheelZoomTool())
+    source = ColumnDataSource(data=dict(x=x, counts=counts, levels=levels))
     plot.vbar(
         x='x',
         top='counts',
         width=0.9,
         source=source,
         line_color="white",
-        fill_color=factor_cmap(
-            'x',
-            palette=Spectral6,
-            factors=levels,
-            start=1,
-            end=2
-        )
+        fill_color=factor_cmap('levels', palette=magma(len(levels)), factors=list(set(levels)))
     )
 
     plot.y_range.start = 0
