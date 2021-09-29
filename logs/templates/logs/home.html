@@ -3,12 +3,12 @@
 
 {% block title %}WRITING MATE{% endblock %}
 
-{% block page-heading %}Your WRITING MATE{% endblock %}
+{% block page-heading %}hi {{ user.first_name }}! :){% endblock %}
 
 {% block content %}
 
 {% if user.is_authenticated %}
-  <p>Welcome {{ user.username }} :)</p>
+  <p>welcome to your personal writing mate! </p>
   <br>
   <br>
 <table>
@@ -18,10 +18,10 @@
 			onload="SVGInject(this)" />
         </td>
         <td>
-            <p>Start now: <br><a class="btn btn-warning" href="/projects/new/">new project</a></p>
-            <p>Continue your work: <br><a class="btn btn-info" href="/logs/new/">new log</a></p>
-            <p>Your newest project: <br><a class="btn btn-primary" href="{% url 'project_view' slug=project.slug %}">{{ project.title }}</a></p>
-            <p>Your latest log entry: <br>{{ log.project }} - {{ log.count }} - {{ log.date }}, {{ log.time }} - {{ log.note }}</p>
+            <p>start now: <br><a class="btn btn-warning" href="/projects/new/">new project</a></p>
+            <p>continue your work: <br><a class="btn btn-info" href="/logs/new/">new log</a></p>
+            <p>your newest project: <br><a class="btn btn-primary" href="{% url 'project_view' slug=project.slug %}">{{ project.title }}</a></p>
+            <p>your latest log entry: <br>{{ log.project }} - {{ log.count }} - {{ log.date }}, {{ log.time }} - {{ log.note }}</p>
         </td>
     </tr>
 </table>

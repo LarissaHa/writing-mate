@@ -31,7 +31,7 @@
       <!-- Sidebar - Brand -->
       <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
         <div class="sidebar-brand-icon rotate-n-15">
-          <i class="fas fa-laugh-wink"></i>
+          <i class="fas fa-pen-nib"></i>
         </div>
         <div class="sidebar-brand-text mx-3">writing mate</div>
       </a>
@@ -69,11 +69,11 @@
         </a>
         <div id="collapseStats" class="collapse" aria-labelledby="headingStats" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
-            <h6 class="collapse-header">Ansicht wechseln</h6>
-            <a class="collapse-item" href="/stats/">nach Tagen</a>
-            <a class="collapse-item" href="/stats/weeks/">nach Wochen</a>
-            <a class="collapse-item" href="/stats/months/">nach Monaten</a>
-            <a class="collapse-item" href="/stats/years/">nach Jahren</a>
+            <h6 class="collapse-header">change stats level</h6>
+            <a class="collapse-item" href="/stats/">by days</a>
+            <a class="collapse-item" href="/stats/weeks/">by weeks</a>
+            <a class="collapse-item" href="/stats/months/">by months</a>
+            <a class="collapse-item" href="/stats/years/">by years</a>
           </div>
         </div>
       </li>
@@ -88,7 +88,7 @@
       <li class="nav-item">
         <a class="nav-link" href="/admin/">
           <i class="fas fa-fw fa-cog"></i>
-          <span>Admin Space</span></a>
+          <span>admin space</span></a>
       </li>
 
       <!-- Divider -->
@@ -262,7 +262,7 @@
             {% if user.is_authenticated %}
             <li class="nav-item dropdown no-arrow">
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ user.username }}</span>
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ user.first_name }}</span>
                 <img class="img-profile rounded-circle" src="{% block user_image %}https://source.unsplash.com/QAB-WJcbgJk/60x60{% endblock %}"">
               </a>
               <!-- Dropdown - User Information -->
