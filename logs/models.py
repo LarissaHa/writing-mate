@@ -25,14 +25,14 @@ class Log(models.Model):
 class Project(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=200, default="")
-    subtitle = models.CharField(max_length=300, default="")
+    subtitle = models.CharField(max_length=300, default="", null=True, blank=True)
     slug = models.SlugField(default="")
     created_at = models.DateTimeField(default=timezone.now)
     goal = models.IntegerField(default=50000)
-    synopsis = models.TextField(default="")
-    excerpt = models.TextField(default="")
-    pinterest = models.URLField(default="")
-    spotify = models.URLField(default="")
+    synopsis = models.TextField(default="", null=True, blank=True)
+    excerpt = models.TextField(default="", null=True, blank=True)
+    pinterest = models.URLField(default="", null=True, blank=True)
+    spotify = models.URLField(default="", null=True, blank=True)
     STATUS = [
         ("prepping", 'prepping'),
         ("in progress", 'in progress'),
