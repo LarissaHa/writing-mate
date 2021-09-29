@@ -139,12 +139,14 @@ def project_view(request, slug):
         return render(request, 'logs/home.html')
     project = get_object_or_404(Project, slug=slug, user=request.user)
     count = Log.objects.filter(project=project, user=request.user).aggregate(Sum('count'))["count__sum"]
-    logs = Log.objects.filter(project=project, user=request.user).order_by("-date")[:5]
+    logs = Log.objects.filter(project=project, user=request.user).order_by("-date")
+    n_logs = len(logs)
+    logs = logs[:5]
     if count is None:
         progress = "0%"
     else:
         progress = str(count / project.goal * 100) + "%"
-    return render(request, 'logs/project_view.html', {'project': project, 'count': count, 'logs': logs, 'progress': progress})
+    return render(request, 'logs/project_view.html', {'project': project, 'count': count, 'logs': logs, 'progress': progress, 'n_logs': n_logs})
 
 
 def project_new(request):
