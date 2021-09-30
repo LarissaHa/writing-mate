@@ -14,7 +14,7 @@ from django.db.models import Sum, Count, Min
 from django.db.models.functions import Extract
 import dateparser
 from datetime import datetime, timedelta
-from django.db.models.functions import TruncMonth, TruncYear, TruncWeek
+from django.db.models.functions import TruncMonth, TruncYear, TruncWeek, TruncDay
 from .utils import time_between
 
 
@@ -229,7 +229,7 @@ def stats(request, mode="days"):
         start_datime = datetime.now() - timedelta(days=30)
         for day in time_between(start_datime, datetime.now(), "daily"):
             stats.append({"level": day.strftime("%d %b"), "total_count": 0})
-        temp = Log.objects.filter(user=request.user).filter(date__gt=start_datime).extra(select={'level': 'date(date)'}).values('level').annotate(total_count=Sum('count'))
+        temp = Log.objects.filter(user=request.user).filter(date__gt=start_datime).extra(select={'day': 'date(date)'}).annotate(level=TruncDay('date')).values('level').annotate(total_count=Sum('count'))
         for s in stats:
             for t in temp:
                 if s["level"] == t["level"].strftime("%d %b"):
