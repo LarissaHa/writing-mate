@@ -13,8 +13,8 @@ class Profile(models.Model):
 class Log(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     project = models.ForeignKey('Project', on_delete=models.CASCADE)
-    date = models.DateField(default=timezone.now)
-    time = models.TimeField(default=timezone.now)
+    date = models.DateField(default=timezone.localtime(timezone.now()))
+    time = models.TimeField(default=timezone.localtime(timezone.now()))
     count = models.IntegerField()
     note = models.TextField(null=True, blank=True)
 
@@ -27,7 +27,7 @@ class Project(models.Model):
     title = models.CharField(max_length=200, default="")
     subtitle = models.CharField(max_length=300, default="", null=True, blank=True)
     slug = models.SlugField(default="")
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.localtime(timezone.now()))
     goal = models.IntegerField(default=50000)
     synopsis = models.TextField(default="", null=True, blank=True)
     excerpt = models.TextField(default="", null=True, blank=True)

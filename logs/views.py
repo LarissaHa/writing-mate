@@ -13,6 +13,7 @@ from bokeh.transform import factor_cmap
 from django.db.models import Sum, Count, Min
 from django.db.models.functions import Extract
 import dateparser
+from django.utils import timezone
 from datetime import datetime, timedelta
 from django.db.models.functions import TruncMonth, TruncYear, TruncWeek, TruncDay
 from .utils import time_between
@@ -228,8 +229,8 @@ def stats(request, mode="days"):
     if mode == "weeks":
         level = "Week"
         # last 15 weeks
-        start_datime = datetime.now() - timedelta(weeks=15)
-        for week in time_between(start_datime, datetime.now(), "weekly"):
+        start_datime = timezone.localtime(timezone.now()) - timedelta(weeks=15)
+        for week in time_between(start_datime, timezone.localtime(timezone.now()), "weekly"):
             stats.append({"level": week.strftime('%V'), "total_count": 0})
         temp = Log.objects.filter(user=request.user).filter(date__gt=start_datime).extra(select={'day': 'date(date)'}).annotate(level=TruncWeek('date')).values('level').annotate(total_count=Sum('count'))
         for s in stats:
@@ -239,8 +240,8 @@ def stats(request, mode="days"):
     elif mode == "months":
         level = "Month"
         # last 12 months
-        start_datime = datetime.now() - timedelta(weeks=53)
-        for month in time_between(start_datime, datetime.now(), "monthly"):
+        start_datime = timezone.localtime(timezone.now()) - timedelta(weeks=53)
+        for month in time_between(start_datime, timezone.localtime(timezone.now()), "monthly"):
             stats.append({"level": month.strftime("%b %Y"), "total_count": 0})
         temp = Log.objects.filter(user=request.user).filter(date__gt=start_datime).extra(select={'day': 'date(date)'}).annotate(level=TruncMonth('date')).values('level').annotate(total_count=Sum('count'))
         for s in stats:
@@ -250,10 +251,10 @@ def stats(request, mode="days"):
     elif mode == "years":
         level = "Year"
         # everything
-        start_datime = datetime.now() - timedelta(weeks=200) # greatest day in DB
-        for year in time_between(start_datime, datetime.now(), "yearly"):
+        start_datime = timezone.localtime(timezone.now()) - timedelta(weeks=200) # greatest day in DB
+        for year in time_between(start_datime, timezone.localtime(timezone.now()), "yearly"):
             stats.append({"level": year.year, "total_count": 0})
-        stats.append({"level": datetime.now().year, "total_count": 0})
+        stats.append({"level": timezone.localtime(timezone.now()).year, "total_count": 0})
         temp = Log.objects.filter(user=request.user).annotate(level=TruncYear('date')).values('level').annotate(total_count=Sum('count'))
         for s in stats:
             for t in temp:
@@ -262,8 +263,8 @@ def stats(request, mode="days"):
     else:
         level = "Day"
         # last 30 days
-        start_datime = datetime.now() - timedelta(days=30)
-        for day in time_between(start_datime, datetime.now(), "daily"):
+        start_datime = timezone.localtime(timezone.now()) - timedelta(days=30)
+        for day in time_between(start_datime, timezone.localtime(timezone.now()), "daily"):
             stats.append({"level": day.strftime("%d %b"), "total_count": 0})
         temp = Log.objects.filter(user=request.user).filter(date__gt=start_datime).extra(select={'day': 'date(date)'}).annotate(level=TruncDay('date')).values('level').annotate(total_count=Sum('count'))
         for s in stats:
