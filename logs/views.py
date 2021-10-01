@@ -164,7 +164,7 @@ def projects(request):
 def project_view(request, slug):
     if request.user.is_anonymous:
         return render(request, 'logs/home.html')
-    project = get_object_or_404(Project, slug=slug, user=request.user)
+    project = get_object_or_404(Project, slug=slug)
     if project.user != request.user:
         return redirect('/not_allowed/')
     count = Log.objects.filter(project=project, user=request.user).aggregate(Sum('count'))["count__sum"]
