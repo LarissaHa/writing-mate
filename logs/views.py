@@ -95,14 +95,14 @@ def logs_new(request):
     if request.user.is_anonymous:
         return render(request, 'logs/home.html')
     if request.method == "POST":
-        form = LogForm(request.POST)
+        form = LogForm(request, request.POST)
         if form.is_valid():
             log = form.save(commit=False)
             log.user = request.user
             log.save()
             return redirect('/logs/') #, {'profile': profile})
     else:
-        form = LogForm()
+        form = LogForm(request)
     return render(request, 'logs/logs_new.html', {'form': form})
 
 
