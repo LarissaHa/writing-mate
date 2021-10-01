@@ -1,0 +1,21 @@
+{% extends "blank.html" %}
+{% load static %}
+
+{% block title %}WRITING MATE{% endblock %}
+
+{% block page-heading %}item deleted successfully!{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-6">
+    <div class="card mb-4 py-3 border-left-success">
+      <div class="card-body">
+        <p>The item was deleted successfully. You can now continue with your work ;)</p>
+      </div>
+    </div>
+    <a class="btn btn-warning" href="/projects/">return to projects</a>
+    <a class="btn btn-info" href="/logs/">return to logs</a>
+  </div>
+</div>
+
+{% endblock %}

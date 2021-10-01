@@ -53,6 +53,10 @@ def chart(data):
     return script, div
 
 
+def not_allowed(request):
+    return render(request, 'logs/not_allowed.html')
+
+
 def contact(request):
     return render(request, 'logs/contact.html')
 
@@ -69,8 +73,14 @@ def welcome(request):
     if request.user.is_anonymous:
         return render(request, 'logs/home.html')
     else:
-        project = Project.objects.filter(user=request.user).latest('created_at')
-        log = Log.objects.filter(user=request.user).latest('date')
+        try:
+            project = Project.objects.filter(user=request.user).latest('created_at')
+        except:
+            project = None
+        try:
+            log = Log.objects.filter(user=request.user).latest('date')
+        except:
+            log = None
         return render(request, 'logs/home.html', {'project': project, 'log': log})
 
 
@@ -100,6 +110,8 @@ def logs_edit(request, pk):
     if request.user.is_anonymous:
         return render(request, 'logs/home.html')
     log = get_object_or_404(Log, pk=pk)
+    if log.user != request.user:
+        return redirect('/not_allowed/')
     if request.method == "POST":
         form = LogForm(request.POST, instance=log)
         if form.is_valid():
@@ -109,7 +121,17 @@ def logs_edit(request, pk):
             return redirect('/logs/') #, {'profile': profile})
     else:
         form = LogForm(instance=log)
-    return render(request, 'logs/logs_edit.html', {'form': form})
+    return render(request, 'logs/logs_edit.html', {'form': form, "log_pk": pk})
+
+
+def logs_delete(request, pk):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
+    to_delete = get_object_or_404(Log, pk=pk)
+    if to_delete.user != request.user:
+        return redirect(request, 'logs/not_allowed.html')
+    to_delete.delete()
+    return(render(request, 'logs/deleted_successfully.html'))
 
 
 def logs2(request):
@@ -173,6 +195,8 @@ def project_edit(request, slug):
     if request.user.is_anonymous:
         return render(request, 'logs/home.html')
     project = get_object_or_404(Project, slug=slug)
+    if project.user != request.user:
+        return redirect('/not_allowed/')
     if request.method == "POST":
         form = ProjectForm(request.POST, instance=project)
         if form.is_valid():
@@ -182,7 +206,17 @@ def project_edit(request, slug):
             return redirect('project_view', slug=project.slug)  #, {'profile': profile})
     else:
         form = ProjectForm(instance=project)
-    return render(request, 'logs/project_edit.html', {'form': form})
+    return render(request, 'logs/project_edit.html', {'form': form, "project_slug": slug})
+
+
+def project_delete(request, slug):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
+    to_delete = get_object_or_404(Project, pk=slug)
+    if to_delete.user != request.user:
+        return redirect(request, 'logs/not_allowed.html')
+    to_delete.delete()
+    return(render(request, 'logs/deleted_successfully.html'))
 
 
 def stats(request, mode="days"):

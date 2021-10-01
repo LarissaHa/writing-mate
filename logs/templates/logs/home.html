@@ -20,8 +20,8 @@
         <td>
             <p>start now: <br><a class="btn btn-warning" href="/projects/new/">new project</a></p>
             <p>continue your work: <br><a class="btn btn-info" href="/logs/new/">new log</a></p>
-            <p>your newest project: <br><a class="btn btn-primary" href="{% url 'project_view' slug=project.slug %}">{{ project.title }}</a></p>
-            <p>your latest log entry: <br>{{ log.project }} - {{ log.count }} - {{ log.date }}, {{ log.time }} - {{ log.note }}</p>
+            {% if project %}<p>your newest project: <br><a class="btn btn-primary" href="{% url 'project_view' slug=project.slug %}">{{ project.title }}</a></p>{% endif %}
+            {% if log %}<p>your latest log entry: <br>{{ log.project }} - {{ log.count }} - {{ log.date }}, {{ log.time }} - {{ log.note }}</p>{% endif %}
         </td>
     </tr>
 </table>

@@ -1,0 +1,22 @@
+{% extends "blank.html" %}
+{% load static %}
+
+{% block title %}WRITING MATE{% endblock %}
+
+{% block page-heading %}this action is not allowed{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-6">
+    <div class="card mb-4 py-3 border-left-danger">
+      <div class="card-body">
+        <p>You tried to do something which is not allowed. If it should be allowed, please contact the admin 
+          as described on the <a href="/contact/">contact page</a>.</p>
+      </div>
+    </div>
+    <a class="btn btn-warning" href="/projects/">return to projects</a>
+    <a class="btn btn-info" href="/logs/">return to logs</a>
+  </div>
+</div>
+
+{% endblock %}
