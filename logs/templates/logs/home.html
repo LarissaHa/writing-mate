@@ -14,7 +14,7 @@
 <table>
     <tr>
         <td>
-            <img class="icons w-50 mb-3" src="{% static 'logs/img/undraw_friends_r511.svg' %}" alt=""
+            <img class="icons w-100 mb-3" src="{% static 'logs/img/undraw_friends_r511.svg' %}" alt=""
 			onload="SVGInject(this)" />
         </td>
         <td>
@@ -30,8 +30,18 @@
   <br>
   <a class="btn btn-dark" href="#" data-toggle="modal" data-target="#logoutModal">Log Out</a>
 {% else %}
-  <p>You are not logged in</p>
-  <a class="btn btn-primary" href="{% url 'login' %}">Log In</a>
+<table>
+  <tr>
+      <td>
+          <img class="icons w-75 mb-3" src="{% static 'logs/img/undraw_welcome_re_h3d9.svg' %}" alt=""
+    onload="SVGInject(this)" />
+      </td>
+      <td>
+        <p>You are not logged in</p>
+        <p><a class="btn btn-primary" href="{% url 'login' %}">Log In</a></p>
+      </td>
+  </tr>
+</table>
 {% endif %}
 
 

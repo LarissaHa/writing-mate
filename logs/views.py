@@ -121,7 +121,7 @@ def logs_edit(request, pk):
             log.save()
             return redirect('/logs/') #, {'profile': profile})
     else:
-        form = LogForm(instance=log)
+        form = LogForm(instance=log, request=request)
     return render(request, 'logs/logs_edit.html', {'form': form, "log_pk": pk})
 
 
