@@ -6,7 +6,9 @@
 {% block page-heading %}{{ project.title }}{% endblock %}
 
 {% block content %}
+{% if project.subtitle %}
 <h5>{{ project.subtitle }}</h5>
+{% else %} {% endif %}
 created at {{ project.created_at }}
 <br>
 <div class="container-fluid">

@@ -20,6 +20,7 @@ urlpatterns = [
     path('imprint/', views.imprint, name='imprint'),
     path('contact/', views.contact, name='contact'),
     path('accounts/register/', views.register, name='register'),
+    path('password_reset/', views.password_reset_request, name='password_reset'),
     path('not_allowed/', views.not_allowed, name='not_allowed'),
     # path('upload/csv/', views.upload_csv, name='upload_csv'),
 ]

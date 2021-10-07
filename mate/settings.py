@@ -28,6 +28,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['127.0.0.1', '.pythonanywhere.com', 'd930bcdf418b.ngrok.io']
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Application definition
 
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'logs.apps.LogsConfig',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [

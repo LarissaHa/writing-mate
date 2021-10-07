@@ -20,7 +20,6 @@ class ProjectForm(forms.ModelForm):
         fields = (
             'title', 
             'subtitle', 
-            'slug', 
             'goal', 
             'unit', 
             'status', 

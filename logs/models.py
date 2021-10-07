@@ -29,6 +29,7 @@ class Project(models.Model):
     slug = models.SlugField(default="")
     created_at = models.DateTimeField(default=timezone.localtime(timezone.now()))
     goal = models.IntegerField(default=50000)
+    topic = models.CharField(max_length=200, default="", null=True, blank=True)
     synopsis = models.TextField(default="", null=True, blank=True)
     excerpt = models.TextField(default="", null=True, blank=True)
     pinterest = models.URLField(default="", null=True, blank=True)
@@ -46,7 +47,6 @@ class Project(models.Model):
         default="prepping",
     )
     # picture = models.ImageField()
-    topic = models.CharField(max_length=200, default="")
     UNITS = [
         ("words", 'words'),
         ("characters", 'characters'),
