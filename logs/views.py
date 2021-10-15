@@ -236,10 +236,15 @@ def project_view(request, slug):
         progress = str(round((count / project.goal * 100), 2)) + "%"
     goals = calc_goals(request.user, project)
     count_today = Log.objects.filter(project=project, user=request.user, date=date.today()).aggregate(Sum('count'))["count__sum"]
-    if count_today is None:
+    if count_today is None or goals is None:
         progress_today = "0%"
     else:
         progress_today = str(round((count_today / goals["daily_goal"] * 100), 2)) + "%"
+        #if goals["weekly_goal"] is None:
+        #    progress_thisweek = "0%"
+        #else:
+        #    count_thisweek = Log.objects.filter(project=project, user=request.user, date=date.today()).aggregate(Sum('count'))["count__sum"]
+        #    progress_thisweek = str(round((count_thisweek / goals["weekly_goal"] * 100), 2)) + "%"
     wc_form = wordcount_form(request, slug)
     if wc_form is None:
         return redirect('project_view', slug=project.slug)
