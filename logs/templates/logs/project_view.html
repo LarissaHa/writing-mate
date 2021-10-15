@@ -52,6 +52,11 @@ created at {{ project.created_at }}
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Progress Today</div>
                         <div class="row no-gutters align-items-center">
+                            {% if progress_today == "0%" %}
+                            <div class="col-auto">
+                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ count_today }}</div>
+                            </div>
+                            {% else %}
                             <div class="col-auto">
                                 <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ progress_today }}</div>
                             </div>
@@ -62,6 +67,7 @@ created at {{ project.created_at }}
                                         aria-valuemax="100"></div>
                                 </div>
                             </div>
+                            {% endif %}
                         </div>
                         {% if goals %}
                         <br>
