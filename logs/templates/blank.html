@@ -44,7 +44,7 @@
           <i class="fas fa-fw fa-home"></i>
           <span>home</span></a>
       </li>
-
+      {% if user.is_authenticated %}
       <hr class="sidebar-divider">
 
       <li class="nav-item">
@@ -77,19 +77,9 @@
           </div>
         </div>
       </li>
-      <hr class="sidebar-divider">
 
-      <!-- Heading -->
-      <div class="sidebar-heading">
-        Admin
-      </div>
-
-      <!-- Nav Item - Tables -->
-      <li class="nav-item">
-        <a class="nav-link" href="/admin/">
-          <i class="fas fa-fw fa-cog"></i>
-          <span>admin space</span></a>
-      </li>
+      {% else %}
+      {% endif %}
 
       <!-- Divider -->
       <hr class="sidebar-divider d-none d-md-block">
@@ -326,6 +316,7 @@
         <div class="container my-auto">
           <div class="copyright text-center my-auto">
             <span>Copyright &copy; writing mate 2021 - <a href="/release_notes/">v1.0.2</a> - <a href="/imprint/">Imprint</a> - <a href="/contact/">Contact</a></span>
+            <span><a class="nav-link" href="/admin/"><i class="fas fa-fw fa-cog"></i> admin space</a></span>
           </div>
         </div>
       </footer>

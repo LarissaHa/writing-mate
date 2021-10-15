@@ -7,6 +7,7 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('logs/', views.logs, name='logs'),
     path('logs/new/', views.logs_new, name='logs_new'),
+    path('logs/new/<str:project_slug>/', views.logs_new, name='logs_new'),
     path('logs/filter/<str:slug>/', views.logs, name='logs_filter'),
     path('logs/<int:pk>/edit/', views.logs_edit, name='logs_edit'),
     path('logs/<int:pk>/delete/', views.logs_delete, name='logs_delete'),

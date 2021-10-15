@@ -97,7 +97,7 @@ def profile(request):
     return render(request, 'logs/profile.html', {'profile': profile})
 
 
-def logs_new(request):
+def logs_new(request, project_slug=None):
     if request.user.is_anonymous:
         return render(request, 'logs/home.html')
     if request.method == "POST":
@@ -108,7 +108,11 @@ def logs_new(request):
             log.save()
             return redirect('/logs/') #, {'profile': profile})
     else:
-        form = LogForm(request)
+        if project_slug is not None:
+            project = get_object_or_404(Project, slug=project_slug)
+            form = LogForm(request, initial={'project': project})
+        else:
+            form = LogForm(request)
     return render(request, 'logs/logs_new.html', {'form': form})
 
 

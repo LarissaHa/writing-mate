@@ -87,7 +87,7 @@ created at {{ project.created_at }}
                             number of logs in this project</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">{{ n_logs }}</div>
                         <br>
-                        <a class="btn btn-info" href="/logs/new/">new log</a>
+                        <a class="btn btn-info" href="{% url 'logs_new' project_slug=project.slug %}">new log</a>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-folder-open fa-2x text-gray-300"></i>
