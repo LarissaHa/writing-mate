@@ -161,13 +161,15 @@ def projects(request):
         "count": Log.objects.filter(project=p, user=request.user).aggregate(Sum('count'))["count__sum"],
         "goal": p.goal,
         "slug": p.slug,
+        "synopsis": p.synopsis,
+        "subtitle": p.subtitle,
         "progress": "0%"
     } for p in temp]
     for p in projects:
         if p["count"] is None:
             continue
         else:
-            p["progress"] = str(p["count"] / p["goal"] * 100) + "%"
+            p["progress"] = str(round((p["count"] / p["goal"] * 100), 2)) + "%"
     return render(request, 'logs/projects.html', {'projects': projects})
 
 

@@ -129,13 +129,19 @@ created at {{ project.created_at }}
         </div>
     </div>
 </div>
+<p>
+{% if project.spotify == "" or project.spotify == None %}{% else %}
 <a href="{{ project.spotify }}" target="_blank" class="btn btn-primary btn-lg btn-circle">
     <i class="fab fa-spotify"></i>
 </a>
+{% endif %}
+{% if project.pinterest == "" or project.pinterest == None %}{% else %}
 <a href="{{ project.pinterest }}" target="_blank" class="btn btn-primary btn-lg btn-circle">
     <i class="fab fa-pinterest-p"></i>
 </a>
-<a class="btn btn-outline-warning" href="{% url 'project_edit' slug=project.slug %}">edit project</a>
+{% endif %}
+</p>
+<p><a class="btn btn-outline-warning" href="{% url 'project_edit' slug=project.slug %}">edit project</a></p>
 <br>
 <br>
 <div class="card shadow mb-4">

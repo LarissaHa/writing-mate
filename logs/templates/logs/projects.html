@@ -41,8 +41,8 @@
     </div>
     <!-- Card Body -->
     <div class="card-body">
-        Synopsis tbd
-        <br>
+        {% if project.subtitle == "" or project.subtitle == None %}{% else %}<b>{{ project.subtitle }}</b><br><br>{% endif %}
+        {% if project.synopsis == "" %}{% else %}<b>{{ project.synopsis }}</b><br><br>{% endif %} 
         <ul>
             <li>{{ project.status }}</li>
             <li>{{ project.count }} {{ project.unit }} / {{ project.goal }} {{ project.unit }}</li>
