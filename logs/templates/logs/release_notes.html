@@ -1,0 +1,83 @@
+{% extends "blank.html" %}
+{% load static %}
+
+{% block title %}WRITING MATE{% endblock %}
+
+{% block page-heading %}release notes{% endblock %}
+
+{% block content %}
+
+<div class="row">
+
+    <div class="col-lg-6">
+        <!-- Basic Card Example -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Release Notes v1.1.0</h6>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>Es gibt jetzt diese hübsche Release Notes Seite!</li>
+                </ul>
+            </div>
+        </div>
+        <!-- Basic Card Example -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Release Notes v1.0.2</h6>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>Slugs von Projekten werden jetzt automatisch generiert, das Feld verschwindet somit auch von der Seite, wo neue Projekte angelegt werden</li>
+                    <li>Topics sind nicht mehr mandatory, um Projekte zu speichern</li>
+                    <li>Projekte können jetzt fehlerfrei gelöscht werden 😄</li>
+                    <li>kleinere Bugs sind beseitigt</li>
+                </ul>
+            </div>
+        </div>
+        <!-- Basic Card Example -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Release Notes v1.0.1</h6>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>Projekte haben jetzt einen Spotify und einen Pinterest Button! Außerdem gibt es Untertitel, Synopsis und Extract für eure Projekte.</li>
+                    <li>die Serverzeit wurde auf Europa umgestell!</li>
+                    <li>kleinere Bugs sind beseitigt sowie die UX wurde verbessert, wo notwendig</li>
+                    <li>eine grobe Roadmap ist ab sofort unter <a href="/contact/">contact</a> einzusehen</li>
+                </ul>
+            </div>
+        </div>
+        <!-- Basic Card Example -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Release Notes v1.0.0</h6>
+            </div>
+            <div class="card-body">
+                Wohooo, <b>writing mate</b> wurde offiziell released! Was für ein wunderbares Ereignis :D Um ehrlich zu sein,
+                hatte ich schon fast nicht mehr dran geglaubt, dass ich dieses Projekt soweit fertig stellen konnte, um es 
+                anderen zu zeigen. Aber hier ist es! <br>
+                Und bitte, falls euch irgendetwas auffällt, oder ihr Kommentare da lassen wollt, schreibt mir eine E-Mail!
+                <br><br>
+                <a href="mailto:larissahaas+yc3ovcfjr3eubbtgj1ct@boards.trello.com" target="_blank" class="btn btn-primary btn-circle">
+                    <i class="fas fa-envelope"></i>
+                </a>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+              symbolbild - larissa arbeitend
+            </div>
+            <div class="card-body">
+                <img class="icons w-100 mb-3" src="{% static 'logs/img/undraw_processing_thoughts_d8ha.svg' %}" alt=""
+                onload="SVGInject(this)" />
+            </div>
+          </div>
+    </div>
+</div>
+
+{% endblock %}

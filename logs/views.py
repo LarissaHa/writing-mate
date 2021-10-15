@@ -63,6 +63,10 @@ def contact(request):
     return render(request, 'logs/contact.html')
 
 
+def release_notes(request):
+    return render(request, 'logs/release_notes.html')
+
+
 def imprint(request):
     return render(request, 'logs/imprint.html')
 

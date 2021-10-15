@@ -19,6 +19,7 @@ urlpatterns = [
     path('stats/', views.stats, name='stats'),
     path('imprint/', views.imprint, name='imprint'),
     path('contact/', views.contact, name='contact'),
+    path('release_notes/', views.release_notes, name='release_notes'),
     path('accounts/register/', views.register, name='register'),
     path('password_reset/', views.password_reset_request, name='password_reset'),
     path('not_allowed/', views.not_allowed, name='not_allowed'),
