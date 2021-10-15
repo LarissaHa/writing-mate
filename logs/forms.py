@@ -13,6 +13,14 @@ class LogForm(forms.ModelForm):
         self.fields["project"].queryset = Project.objects.filter(user=request.user).order_by("-created_at")
 
 
+class WordcountForm(forms.ModelForm):
+    class Meta:
+        model = Log
+        fields = ('count',)
+
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
 class ProjectForm(forms.ModelForm):
 
     class Meta:
@@ -20,8 +28,9 @@ class ProjectForm(forms.ModelForm):
         fields = (
             'title', 
             'subtitle', 
-            'goal', 
+            'goal',
             'unit', 
+            'deadline',
             'status', 
             'topic', 
             'type', 

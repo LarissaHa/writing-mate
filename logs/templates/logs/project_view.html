@@ -21,6 +21,22 @@ created at {{ project.created_at }}
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                             {{ project.unit }}</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">{{ count }} / {{ project.goal }}</div>
+                        <br>
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Progress</div>
+                        <div class="row no-gutters align-items-center">
+                            <div class="col-auto">
+                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ progress }}</div>
+                            </div>
+                            <div class="col">
+                                <div class="progress progress-sm mr-2">
+                                    <div class="progress-bar bg-primary" role="progressbar"
+                                        style="width: {{ progress }}" aria-valuenow="{{ progress }}" aria-valuemin="0"
+                                        aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <a href="#" data-toggle="modal" data-target="#addWordcount" class="btn btn-warning">add to progress</a>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-pen-nib fa-2x text-gray-300"></i>
@@ -34,20 +50,32 @@ created at {{ project.created_at }}
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Progress
-                        </div>
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Progress Today</div>
                         <div class="row no-gutters align-items-center">
                             <div class="col-auto">
-                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ progress }}</div>
+                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ progress_today }}</div>
                             </div>
                             <div class="col">
                                 <div class="progress progress-sm mr-2">
                                     <div class="progress-bar bg-primary" role="progressbar"
-                                        style="width: {{ progress }}" aria-valuenow="{{ progress }}" aria-valuemin="0"
+                                        style="width: {{ progress_today }}" aria-valuenow="{{ progress_today }}" aria-valuemin="0"
                                         aria-valuemax="100"></div>
                                 </div>
                             </div>
                         </div>
+                        {% if goals %}
+                        <br>
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Goals</div>
+                        <div class="col-auto">
+                            <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ goals.daily_goal }} per day</div>
+                        </div>
+                        {% if goals.weekly_goal %}
+                        <div class="col-auto">
+                            <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ goals.weekly_goal }} per week</div>
+                        </div>
+                        {% else %}{% endif %}
+                        until {{ project.deadline }}
+                        {% else %}{% endif %}
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-quote-right fa-2x text-gray-300"></i>
@@ -164,5 +192,24 @@ created at {{ project.created_at }}
     </div>
 </div>
 </div>
-
+  <!-- Add Wordcount -->
+  <div class="modal fade" id="addWordcount" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Increase your Wordcount!</h5>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form method="POST" class="log-form">{% csrf_token %}
+            {{ wc_form.as_p }}
+            <button type="submit" class="save btn btn-primary">save</button>
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

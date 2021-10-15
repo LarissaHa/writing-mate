@@ -4,7 +4,7 @@ from django.db.models.functions.datetime import TruncWeek
 from django.shortcuts import get_object_or_404, render, redirect
 from django.utils.text import slugify
 from .models import Log, Project, Profile
-from .forms import LogForm, ProjectForm
+from .forms import LogForm, ProjectForm, WordcountForm
 from bokeh.plotting import figure
 from bokeh.embed import components
 from bokeh.models import ColumnDataSource, FactorRange, BoxSelectTool
@@ -15,7 +15,7 @@ from django.db.models import Sum, Count, Min
 from django.db.models.functions import Extract
 import dateparser
 from django.utils import timezone
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from django.db.models.functions import TruncMonth, TruncYear, TruncWeek, TruncDay
 from .utils import time_between
 
@@ -84,7 +84,7 @@ def welcome(request):
         except:
             project = None
         try:
-            log = Log.objects.filter(user=request.user).latest('date')
+            log = Log.objects.filter(user=request.user, is_update=False).latest('date')
         except:
             log = None
         return render(request, 'logs/home.html', {'project': project, 'log': log})
@@ -96,6 +96,33 @@ def profile(request):
     profile = get_object_or_404(Profile, user=request.user)
     return render(request, 'logs/profile.html', {'profile': profile})
 
+
+def wordcount_form(request, slug):
+    project = get_object_or_404(Project, slug=slug)
+    total_count = Log.objects.filter(project=project, user=request.user).aggregate(Sum('count'))["count__sum"]
+    if request.method == "POST":
+        form = WordcountForm(request, request.POST)
+        if form.is_valid():
+            log = form.save(commit=False)
+            log.user = request.user
+            log.project = project
+            log.date = date.today()
+            log.time = datetime.now()
+            count = log.count
+            log.count = count - total_count
+            log.is_update = True
+            log.save()
+            return None
+    else:
+        form = WordcountForm(request, initial={'count': total_count})
+    return form
+
+
+def wordcount(request, slug):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
+    form = wordcount_form(request, slug)
+    return render(request, 'logs/wordcount.html', {'wc_form': form})
 
 def logs_new(request, project_slug=None):
     if request.user.is_anonymous:
@@ -173,6 +200,26 @@ def projects(request):
     return render(request, 'logs/projects.html', {'projects': projects})
 
 
+def calc_goals(user, project):
+    if project.deadline is not None and project.deadline > date.today():
+        x = 1
+        count = Log.objects.filter(project=project, user=user, date__gt=date.today()).aggregate(Sum('count'))["count__sum"]
+        if count is None:
+            count = 0
+        logs_today = Log.objects.filter(project=project, user=user, date=date.today())
+        if len(logs_today) <= 0:
+            x = x - 1
+        todo = project.goal - count
+        difference = project.deadline - date.today()
+        daily_goal = round(todo/ difference.days)
+        if ((difference.days+x) / 7) >=1:
+            weekly_goal = round(todo / (difference.days / 7))
+        else:
+            weekly_goal = None
+        return {"daily_goal": daily_goal, "weekly_goal": weekly_goal}
+    return None
+
+
 def project_view(request, slug):
     if request.user.is_anonymous:
         return render(request, 'logs/home.html')
@@ -180,14 +227,33 @@ def project_view(request, slug):
     if project.user != request.user:
         return redirect('/not_allowed/')
     count = Log.objects.filter(project=project, user=request.user).aggregate(Sum('count'))["count__sum"]
-    logs = Log.objects.filter(project=project, user=request.user).order_by("-date")
+    logs = Log.objects.filter(project=project, user=request.user, is_update=False).order_by("-date")
     n_logs = len(logs)
     logs = logs[:5]
     if count is None:
         progress = "0%"
     else:
-        progress = str(count / project.goal * 100) + "%"
-    return render(request, 'logs/project_view.html', {'project': project, 'count': count, 'logs': logs, 'progress': progress, 'n_logs': n_logs})
+        progress = str(round((count / project.goal * 100), 2)) + "%"
+    goals = calc_goals(request.user, project)
+    count_today = Log.objects.filter(project=project, user=request.user, date=date.today()).aggregate(Sum('count'))["count__sum"]
+    if count_today is None:
+        progress_today = "0%"
+    else:
+        progress_today = str(round((count_today / goals["daily_goal"] * 100), 2)) + "%"
+    wc_form = wordcount_form(request, slug)
+    if wc_form is None:
+        return redirect('project_view', slug=project.slug)
+    return render(request, 'logs/project_view.html', {
+        'project': project,
+        'count': count,
+        'logs': logs,
+        'progress': progress,
+        'n_logs': n_logs,
+        'goals': goals,
+        'count_today': count_today,
+        'progress_today': progress_today,
+        'wc_form': wc_form
+    })
 
 
 def project_new(request):
@@ -303,13 +369,13 @@ def logs(request, slug=None):
     projects = Project.objects.filter(user=request.user).order_by("-created_at")
     if "GET" == request.method:
         if slug is None:
-            logs = Log.objects.filter(user=request.user).order_by("-date")[:20]
+            logs = Log.objects.filter(user=request.user, is_update=False).order_by("-date")[:20]
             filtered_by = "filter by project"
             return render(request, 'logs/logs.html', {'logs': logs, 'projects': projects, 'filtered_by': filtered_by})
         else:
             project = get_object_or_404(Project, slug=slug, user=request.user)
             filtered_by = project.title
-            logs = Log.objects.filter(project=project, user=request.user).order_by("-date")[:20]
+            logs = Log.objects.filter(project=project, user=request.user, is_update=False).order_by("-date")[:20]
             return render(request, 'logs/logs.html', {'logs': logs, 'projects': projects, 'filtered_by': filtered_by})
             # return render(request, "logs/logs.html", data)
     # if not GET, then proceed

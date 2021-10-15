@@ -17,6 +17,7 @@ class Log(models.Model):
     time = models.TimeField(default=timezone.localtime(timezone.now()))
     count = models.IntegerField()
     note = models.TextField(null=True, blank=True)
+    is_update = models.BooleanField(default=False)
 
     def __str__(self):
         return str("{0} ({1} {2})".format(self.project, self.date, self.time))
@@ -29,6 +30,7 @@ class Project(models.Model):
     slug = models.SlugField(default="")
     created_at = models.DateTimeField(default=timezone.localtime(timezone.now()))
     goal = models.IntegerField(default=50000)
+    deadline = models.DateField(default=timezone.localtime(timezone.now()), null=True, blank=True)
     topic = models.CharField(max_length=200, default="", null=True, blank=True)
     synopsis = models.TextField(default="", null=True, blank=True)
     excerpt = models.TextField(default="", null=True, blank=True)
