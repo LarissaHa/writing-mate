@@ -119,6 +119,8 @@ def profile(request):
 def wordcount_form(request, slug):
     project = get_object_or_404(Project, slug=slug)
     total_count = Log.objects.filter(project=project, user=request.user).aggregate(Sum('count'))["count__sum"]
+    if total_count is None:
+        total_count = 0
     if request.method == "POST":
         form = WordcountForm(request, request.POST)
         if form.is_valid():
@@ -225,7 +227,8 @@ def calc_goals(user, project):
         count = Log.objects.filter(project=project, user=user, date__lt=date.today()).aggregate(Sum('count'))["count__sum"]
         if count is None:
             count = 0
-        logs_today = Log.objects.filter(project=project, user=user, date=timezone.localtime(timezone.now()))
+        logs_today = Log.objects.filter(project=project, user=user, date=timezone.localtime(timezone.now()), is_update=False)
+        print(logs_today)
         if len(logs_today) <= 0:
             x = x - 1
         todo = project.goal - count
@@ -254,7 +257,7 @@ def project_view(request, slug):
     else:
         progress = str(round((count / project.goal * 100), 2)) + "%"
     goals = calc_goals(request.user, project)
-    count_today = Log.objects.filter(project=project, user=request.user, date=timezone.localtime(timezone.now())).aggregate(Sum('count'))["count__sum"]
+    count_today = Log.objects.filter(project=project, user=request.user, date=timezone.localtime(timezone.now()), is_update=False).aggregate(Sum('count'))["count__sum"]
     if count_today is None or goals is None:
         progress_today = "0%"
     else:
@@ -335,7 +338,7 @@ def stats(request, mode="days"):
         start_datime = timezone.localtime(timezone.now()) - timedelta(weeks=15)
         for week in time_between(start_datime, timezone.localtime(timezone.now()), "weekly"):
             stats.append({"level": week.strftime('%V'), "total_count": 0})
-        temp = Log.objects.filter(user=request.user).filter(date__gt=start_datime).extra(select={'day': 'date(date)'}).annotate(level=TruncWeek('date')).values('level').annotate(total_count=Sum('count'))
+        temp = Log.objects.filter(user=request.user, is_update=False, date__gt=start_datime).extra(select={'day': 'date(date)'}).annotate(level=TruncWeek('date')).values('level').annotate(total_count=Sum('count'))
         for s in stats:
             for t in temp:
                 if s["level"] == t["level"].strftime('%V'):
@@ -346,7 +349,7 @@ def stats(request, mode="days"):
         start_datime = timezone.localtime(timezone.now()) - timedelta(weeks=53)
         for month in time_between(start_datime, timezone.localtime(timezone.now()), "monthly"):
             stats.append({"level": month.strftime("%b %Y"), "total_count": 0})
-        temp = Log.objects.filter(user=request.user).filter(date__gt=start_datime).extra(select={'day': 'date(date)'}).annotate(level=TruncMonth('date')).values('level').annotate(total_count=Sum('count'))
+        temp = Log.objects.filter(user=request.user, is_update=False, date__gt=start_datime).extra(select={'day': 'date(date)'}).annotate(level=TruncMonth('date')).values('level').annotate(total_count=Sum('count'))
         for s in stats:
             for t in temp:
                 if s["level"] == t["level"].strftime('%b %Y'):
@@ -358,7 +361,7 @@ def stats(request, mode="days"):
         for year in time_between(start_datime, timezone.localtime(timezone.now()), "yearly"):
             stats.append({"level": year.year, "total_count": 0})
         stats.append({"level": timezone.localtime(timezone.now()).year, "total_count": 0})
-        temp = Log.objects.filter(user=request.user).annotate(level=TruncYear('date')).values('level').annotate(total_count=Sum('count'))
+        temp = Log.objects.filter(user=request.user, is_update=False).annotate(level=TruncYear('date')).values('level').annotate(total_count=Sum('count'))
         for s in stats:
             for t in temp:
                 if s["level"] == t["level"].year:
@@ -369,13 +372,13 @@ def stats(request, mode="days"):
         start_datime = timezone.localtime(timezone.now()) - timedelta(days=30)
         for day in time_between(start_datime, timezone.localtime(timezone.now()), "daily"):
             stats.append({"level": day.strftime("%d %b"), "total_count": 0})
-        temp = Log.objects.filter(user=request.user).filter(date__gt=start_datime).extra(select={'day': 'date(date)'}).annotate(level=TruncDay('date')).values('level').annotate(total_count=Sum('count'))
+        temp = Log.objects.filter(user=request.user, is_update=False, date__gt=start_datime).extra(select={'day': 'date(date)'}).annotate(level=TruncDay('date')).values('level').annotate(total_count=Sum('count'))
         for s in stats:
             for t in temp:
                 if s["level"] == t["level"].strftime("%d %b"):
                     s["total_count"] = t["total_count"]
     start_datime
-    logs = Log.objects.filter(user=request.user).filter(date__gt=start_datime).extra(select={'level': 'date(date)'}).values('level')
+    logs = Log.objects.filter(user=request.user, is_update=False, date__gt=start_datime).extra(select={'level': 'date(date)'}).values('level')
     written_on_days = len(logs.distinct())
     total_count = sum([l["total_count"] for l in logs.annotate(total_count=Sum('count'))])
     total_logs = logs.count()

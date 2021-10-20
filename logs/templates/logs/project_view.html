@@ -36,7 +36,7 @@ created at {{ project.created_at }}
                             </div>
                         </div>
                         <br>
-                        <a href="#" data-toggle="modal" data-target="#addWordcount" class="btn btn-warning">add to progress</a>
+                        <a href="#" data-toggle="modal" data-target="#addWordcount" class="btn btn-warning">set progress count</a>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-pen-nib fa-2x text-gray-300"></i>
@@ -203,12 +203,13 @@ created at {{ project.created_at }}
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Increase your Wordcount!</h5>
+          <h5 class="modal-title" id="exampleModalLabel">Change your Progess Count</h5>
           <button class="close" type="button" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
         </div>
         <div class="modal-body">
+            <p>Caution! Changes here will not be reflected in any statistic or progress bar!</p>
           <form method="POST" class="log-form">{% csrf_token %}
             {{ wc_form.as_p }}
             <button type="submit" class="save btn btn-primary">save</button>
