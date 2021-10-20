@@ -1,8 +1,21 @@
 from django import forms
 
+#from .widgets import XDSoftDateTimePickerInput
 from .models import Log, Project
 
+#class DateInput(forms.DateInput):
+#    input_type = 'date'
+
+
+class LogEditForm(forms.ModelForm):
+    #date = forms.DateField(input_formats=['%Y-%m-%d'], widget=XDSoftDateTimePickerInput())
+    
+    class Meta:
+        model = Log
+        fields = ('count', 'date', 'time', 'note')
+
 class LogForm(forms.ModelForm):
+    #date = forms.DateField(input_formats=['%Y-%m-%d'], widget=XDSoftDateTimePickerInput())
     
     class Meta:
         model = Log
