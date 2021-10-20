@@ -224,9 +224,12 @@ def projects(request):
 def calc_goals(user, project):
     if project.deadline is not None and project.deadline > date.today():
         x = 1
-        count = Log.objects.filter(project=project, user=user, date__lt=date.today()).aggregate(Sum('count'))["count__sum"]
-        if count is None:
-            count = 0
+        count_today = Log.objects.filter(project=project, user=user, date__lt=date.today()).aggregate(Sum('count'))["count__sum"]
+        count_update = Log.objects.filter(project=project, user=user, is_update=True).aggregate(Sum('count'))["count__sum"]
+        count = (
+            (0 if count_today is None else count_today)
+            + (0 if count_update is None else count_update)
+        )
         logs_today = Log.objects.filter(project=project, user=user, date=timezone.localtime(timezone.now()), is_update=False)
         print(logs_today)
         if len(logs_today) <= 0:
