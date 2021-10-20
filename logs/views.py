@@ -1,10 +1,11 @@
 import re
 from django.db.models.fields import DateTimeField
+from django.views.generic import CreateView
 from django.db.models.functions.datetime import TruncWeek
 from django.shortcuts import get_object_or_404, render, redirect
 from django.utils.text import slugify
 from .models import Log, Project, Profile
-from .forms import LogForm, ProjectForm, WordcountForm
+from .forms import LogForm, ProjectForm, WordcountForm, LogEditForm
 from bokeh.plotting import figure
 from bokeh.embed import components
 from bokeh.models import ColumnDataSource, FactorRange, BoxSelectTool
@@ -19,6 +20,24 @@ from datetime import datetime, timedelta, date
 from django.db.models.functions import TruncMonth, TruncYear, TruncWeek, TruncDay
 from .utils import time_between
 
+
+def xdsoft_datetimepicker(request, project_slug=None):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
+    if request.method == "POST":
+        form = LogForm(request, request.POST)
+        if form.is_valid():
+            log = form.save(commit=False)
+            log.user = request.user
+            log.save()
+            return redirect('/logs/') #, {'profile': profile})
+    else:
+        if project_slug is not None:
+            project = get_object_or_404(Project, slug=project_slug)
+            form = LogForm(request, initial={'project': project})
+        else:
+            form = LogForm(request)
+    return render(request, 'logs/xdsoft_event_form.html', {'form': form})
 
 def chart(data):
     #print(data[0])
@@ -137,9 +156,9 @@ def logs_new(request, project_slug=None):
     else:
         if project_slug is not None:
             project = get_object_or_404(Project, slug=project_slug)
-            form = LogForm(request, initial={'project': project})
+            form = LogForm(request, initial={'project': project, 'date': date.today(), 'time': timezone.localtime(timezone.now())})
         else:
-            form = LogForm(request)
+            form = LogForm(request, initial={'date': date.today(), 'time': timezone.localtime(timezone.now())})
     return render(request, 'logs/logs_new.html', {'form': form})
 
 
@@ -150,14 +169,14 @@ def logs_edit(request, pk):
     if log.user != request.user:
         return redirect('/not_allowed/')
     if request.method == "POST":
-        form = LogForm(request.POST, instance=log)
+        form = LogEditForm(request.POST, instance=log)
         if form.is_valid():
             log = form.save(commit=False)
             log.user = request.user
             log.save()
             return redirect('/logs/') #, {'profile': profile})
     else:
-        form = LogForm(instance=log, request=request)
+        form = LogEditForm(instance=log)
     return render(request, 'logs/logs_edit.html', {'form': form, "log_pk": pk})
 
 
@@ -203,15 +222,15 @@ def projects(request):
 def calc_goals(user, project):
     if project.deadline is not None and project.deadline > date.today():
         x = 1
-        count = Log.objects.filter(project=project, user=user, date__gt=date.today()).aggregate(Sum('count'))["count__sum"]
+        count = Log.objects.filter(project=project, user=user, date__lt=date.today()).aggregate(Sum('count'))["count__sum"]
         if count is None:
             count = 0
-        logs_today = Log.objects.filter(project=project, user=user, date=date.today())
+        logs_today = Log.objects.filter(project=project, user=user, date=timezone.localtime(timezone.now()))
         if len(logs_today) <= 0:
             x = x - 1
         todo = project.goal - count
-        difference = project.deadline - date.today()
-        daily_goal = round(todo/ difference.days)
+        difference = project.deadline - timezone.localtime(timezone.now()).date()
+        daily_goal = round(todo / difference.days)
         if ((difference.days+x) / 7) >=1:
             weekly_goal = round(todo / (difference.days / 7))
         else:
@@ -235,7 +254,7 @@ def project_view(request, slug):
     else:
         progress = str(round((count / project.goal * 100), 2)) + "%"
     goals = calc_goals(request.user, project)
-    count_today = Log.objects.filter(project=project, user=request.user, date=date.today()).aggregate(Sum('count'))["count__sum"]
+    count_today = Log.objects.filter(project=project, user=request.user, date=timezone.localtime(timezone.now())).aggregate(Sum('count'))["count__sum"]
     if count_today is None or goals is None:
         progress_today = "0%"
     else:
@@ -270,6 +289,7 @@ def project_new(request):
             project = form.save(commit=False)
             project.user = request.user
             project.slug = slugify(str(project.user) + " " + str(project.title))
+            project.created_at = timezone.localtime(timezone.now())
             project.save()
             return redirect('project_view', slug=project.slug)  #, {'profile': profile})
     else:

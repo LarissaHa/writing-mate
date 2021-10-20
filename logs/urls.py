@@ -25,5 +25,6 @@ urlpatterns = [
     path('password_reset/', views.password_reset_request, name='password_reset'),
     path('not_allowed/', views.not_allowed, name='not_allowed'),
     path('wordcount/<str:slug>/', views.wordcount, name='wordcount'),
+    # path('xdsoft-datetimepicker/', views.xdsoft_datetimepicker, name='xdsoft'),
     # path('upload/csv/', views.upload_csv, name='upload_csv'),
 ]
