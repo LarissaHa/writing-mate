@@ -29,7 +29,7 @@
         <div>
             <a href="{% url 'project_view' slug=project.slug %}">
             {% if project.image %}
-            <img class="icons w-100 mb-3" src="{{ project.image.url }}" alt=""/>
+            <img class="icons w-100 mb-3" src="{{MEDIA_URL}}{{ project.image.url }}" alt=""/>
             {% else %}
             <img class="icons w-100 mb-3" src="{% static 'logs/img/empty_project_image.png' %}" alt=""/>
             {% endif %}
