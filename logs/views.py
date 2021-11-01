@@ -216,7 +216,8 @@ def projects(request):
         "slug": p.slug,
         "synopsis": p.synopsis,
         "subtitle": p.subtitle,
-        "progress": "0%"
+        "progress": "0%",
+        "image": p.image
     } for p in temp]
     for p in projects:
         if p["count"] is None:
@@ -315,7 +316,7 @@ def project_edit(request, slug):
     if project.user != request.user:
         return redirect('/not_allowed/')
     if request.method == "POST":
-        form = ProjectForm(request.POST, instance=project)
+        form = ProjectForm(request.POST, request.FILES, instance=project)
         if form.is_valid():
             project = form.save(commit=False)
             project.user = request.user

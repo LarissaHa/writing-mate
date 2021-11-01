@@ -36,6 +36,7 @@ class Project(models.Model):
     excerpt = models.TextField(default="", null=True, blank=True)
     pinterest = models.URLField(default="", null=True, blank=True)
     spotify = models.URLField(default="", null=True, blank=True)
+    image = models.ImageField(upload_to='images', default=None, null=True, blank=True)
     STATUS = [
         ("prepping", 'prepping'),
         ("in progress", 'in progress'),

@@ -9,7 +9,7 @@
 <table>
 	<tr>
 		<td>
-			<form method="POST" class="project-form">{% csrf_token %}
+			<form method="POST" enctype="multipart/form-data" class="project-form">{% csrf_token %}
 				{{ form.as_p }}
 				<button type="submit" class="save btn btn-primary">save</button>
 			</form>

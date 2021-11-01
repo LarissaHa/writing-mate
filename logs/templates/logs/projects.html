@@ -23,36 +23,52 @@
 <a class="btn btn-warning" href="/projects/new/">new project</a>
 <br><br>
 {% for project in projects %}
-<div class="card shadow mb-4">
-    <!-- Card Header - Dropdown -->
-    <div
-        class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary"><a href="{% url 'project_view' slug=project.slug %}">{{ project.title }}</a></h6>
-        <div class="dropdown no-arrow">
-            <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+<div class="row">
+    <div class="col-lg-2">
+        <!-- Default Card Example -->
+        <div>
+            <a href="{% url 'project_view' slug=project.slug %}">
+            {% if project.image %}
+            <img class="icons w-100 mb-3" src="{{ project.image.url }}" alt=""/>
+            {% else %}
+            <img class="icons w-100 mb-3" src="{% static 'logs/img/empty_project_image.png' %}" alt=""/>
+            {% endif %}
             </a>
-            <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                aria-labelledby="dropdownMenuLink">
-                <a class="dropdown-item" href="{% url 'project_edit' slug=project.slug %}">edit project</a>
-            </div>
         </div>
     </div>
-    <!-- Card Body -->
-    <div class="card-body">
-        {% if project.subtitle == "" or project.subtitle == None %}{% else %}<b>{{ project.subtitle }}</b><br><br>{% endif %}
-        {% if project.synopsis == "" %}{% else %}<b>{{ project.synopsis }}</b><br><br>{% endif %} 
-        <ul>
-            <li>{{ project.status }}</li>
-            <li>{{ project.count }} {{ project.unit }} / {{ project.goal }} {{ project.unit }}</li>
-            <div class="progress">
-                <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"
-                aria-valuenow="{{ project.progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ project.progress }}">
-                {{ project.progress }} complete
+    <div class="col-lg-10">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div
+                class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary"><a href="{% url 'project_view' slug=project.slug %}">{{ project.title }}</a></h6>
+                <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                        aria-labelledby="dropdownMenuLink">
+                        <a class="dropdown-item" href="{% url 'project_edit' slug=project.slug %}">edit project</a>
+                    </div>
                 </div>
             </div>
-        </ul>
+            <!-- Card Body -->
+            <div class="card-body">
+                {% if project.subtitle == "" or project.subtitle == None %}{% else %}<b>{{ project.subtitle }}</b><br><br>{% endif %}
+                {% if project.synopsis == "" %}{% else %}<b>{{ project.synopsis }}</b><br><br>{% endif %} 
+                <ul>
+                    <li>{{ project.status }}</li>
+                    <li>{{ project.count }} {{ project.unit }} / {{ project.goal }} {{ project.unit }}</li>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"
+                        aria-valuenow="{{ project.progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ project.progress }}">
+                        {{ project.progress }} complete
+                        </div>
+                    </div>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
 {% endfor %}
