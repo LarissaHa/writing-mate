@@ -50,5 +50,6 @@ class ProjectForm(forms.ModelForm):
             'synopsis', 
             'excerpt', 
             'pinterest', 
-            'spotify'
+            'spotify',
+            'image'
         )

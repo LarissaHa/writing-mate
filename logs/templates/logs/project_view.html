@@ -140,6 +140,34 @@ created at {{ project.created_at }}
 </div>
 <br>
 <br>
+{% if project.image %}
+<div class="row">
+    <div class="col-lg-6">
+        <!-- Default Card Example -->
+        <div class="card mb-4">
+            <div class="card-header">
+                project image
+            </div>
+            <div class="card-body">
+                <img class="icons w-100 mb-3" src="{{ project.image.url }}" alt=""/>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                further info
+            </div>
+            <div class="card-body">
+                synopsis:
+                <p>{{ project.synopsis }}</p>
+                excerpt:
+                <p>{{ project.excerpt }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
 <div class="row">
     <div class="col-lg-6">
         <!-- Default Card Example -->
@@ -163,6 +191,7 @@ created at {{ project.created_at }}
         </div>
     </div>
 </div>
+{% endif %}
 <p>
 {% if project.spotify == "" or project.spotify == None %}{% else %}
 <a href="{{ project.spotify }}" target="_blank" class="btn btn-primary btn-lg btn-circle">
