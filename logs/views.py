@@ -103,7 +103,7 @@ def welcome(request):
         except:
             project = None
         try:
-            log = Log.objects.filter(user=request.user, is_update=False).latest('date')
+            log = Log.objects.filter(user=request.user, is_update=False).latest('date', 'time')
         except:
             log = None
         script, div, metrics = home_stats(request)
