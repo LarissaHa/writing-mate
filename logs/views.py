@@ -106,7 +106,8 @@ def welcome(request):
             log = Log.objects.filter(user=request.user, is_update=False).latest('date')
         except:
             log = None
-        return render(request, 'logs/home.html', {'project': project, 'log': log})
+        script, div, metrics = home_stats(request)
+        return render(request, 'logs/home.html', {'project': project, 'log': log, 'script': script, 'div': div, 'metrics': metrics})
 
 
 def profile(request):
@@ -145,6 +146,7 @@ def wordcount(request, slug):
     form = wordcount_form(request, slug)
     return render(request, 'logs/wordcount.html', {'wc_form': form})
 
+
 def logs_new(request, project_slug=None):
     if request.user.is_anonymous:
         return render(request, 'logs/home.html')
@@ -154,7 +156,10 @@ def logs_new(request, project_slug=None):
             log = form.save(commit=False)
             log.user = request.user
             log.save()
-            return redirect('/logs/') #, {'profile': profile})
+            if project_slug:
+                return redirect(f'/projects/{project_slug}') #, {'profile': profile})
+            else:
+                return redirect('/logs/')
     else:
         if project_slug is not None:
             project = get_object_or_404(Project, slug=project_slug)
@@ -252,7 +257,7 @@ def project_view(request, slug):
     if project.user != request.user:
         return redirect('/not_allowed/')
     count = Log.objects.filter(project=project, user=request.user).aggregate(Sum('count'))["count__sum"]
-    logs = Log.objects.filter(project=project, user=request.user, is_update=False).order_by("-date")
+    logs = Log.objects.filter(project=project, user=request.user, is_update=False).order_by("-date", "-time")
     n_logs = len(logs)
     logs = logs[:5]
     if count is None:
@@ -331,6 +336,25 @@ def project_delete(request, slug):
     return(render(request, 'logs/deleted_successfully.html'))
 
 
+def home_stats(request):
+    stats = []
+    start_datime = timezone.localtime(timezone.now()) - timedelta(days=6)
+    for day in time_between(start_datime, timezone.localtime(timezone.now()), "daily"):
+        stats.append({"level": day.strftime("%A"), "total_count": 0})
+    temp = Log.objects.filter(user=request.user, is_update=False, date__gt=start_datime).extra(select={'day': 'date(date)'}).annotate(level=TruncDay('date')).values('level').annotate(total_count=Sum('count'))
+    for s in stats:
+        for t in temp:
+            if s["level"] == t["level"].strftime("%A"):
+                s["total_count"] = t["total_count"]
+    script, div = chart(stats)
+    logs = Log.objects.filter(user=request.user, is_update=False).extra(select={'level': 'date(date)'}).values('level')
+    written_on_days = len(logs.distinct())
+    total_count = sum([l["total_count"] for l in logs.annotate(total_count=Sum('count'))])
+    total_logs = logs.count()
+    metrics = {"written_on_days": written_on_days, "total_count": total_count, "total_logs": total_logs}
+    return script, div, metrics
+
+
 def stats(request, mode="days"):
     if request.user.is_anonymous:
         return render(request, 'logs/home.html')
@@ -374,11 +398,11 @@ def stats(request, mode="days"):
         # last 30 days
         start_datime = timezone.localtime(timezone.now()) - timedelta(days=30)
         for day in time_between(start_datime, timezone.localtime(timezone.now()), "daily"):
-            stats.append({"level": day.strftime("%d %b"), "total_count": 0})
+            stats.append({"level": day.strftime("%d"), "total_count": 0})
         temp = Log.objects.filter(user=request.user, is_update=False, date__gt=start_datime).extra(select={'day': 'date(date)'}).annotate(level=TruncDay('date')).values('level').annotate(total_count=Sum('count'))
         for s in stats:
             for t in temp:
-                if s["level"] == t["level"].strftime("%d %b"):
+                if s["level"] == t["level"].strftime("%d"):
                     s["total_count"] = t["total_count"]
     start_datime
     logs = Log.objects.filter(user=request.user, is_update=False, date__gt=start_datime).extra(select={'level': 'date(date)'}).values('level')
@@ -400,13 +424,13 @@ def logs(request, slug=None):
     projects = Project.objects.filter(user=request.user).order_by("-created_at")
     if "GET" == request.method:
         if slug is None:
-            logs = Log.objects.filter(user=request.user, is_update=False).order_by("-date")[:20]
+            logs = Log.objects.filter(user=request.user, is_update=False).order_by("-date", "-time")[:20]
             filtered_by = "filter by project"
             return render(request, 'logs/logs.html', {'logs': logs, 'projects': projects, 'filtered_by': filtered_by})
         else:
             project = get_object_or_404(Project, slug=slug, user=request.user)
             filtered_by = project.title
-            logs = Log.objects.filter(project=project, user=request.user, is_update=False).order_by("-date")[:20]
+            logs = Log.objects.filter(project=project, user=request.user, is_update=False).order_by("-date", "-time")[:20]
             return render(request, 'logs/logs.html', {'logs': logs, 'projects': projects, 'filtered_by': filtered_by})
             # return render(request, "logs/logs.html", data)
     # if not GET, then proceed
