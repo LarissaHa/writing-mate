@@ -6,20 +6,19 @@
 {% block page-heading %}your projects{% endblock %}
 
 {% block content %}
-<!--div class="dropdown mb-4">
+<div class="dropdown mb-4">
     <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       sort by
     </button>
     <div class="dropdown-menu animated--fade-in" aria-labelledby="dropdownMenuButton">
       <a class="dropdown-item" href="/projects/"><i class="fa fa-times" aria-hidden="true"></i>  clear sorting</a>
-      <a class="dropdown-item" href="#">log - latest first</a>
-      <a class="dropdown-item" href="#">date - newest first</a>
-      <a class="dropdown-item" href="#">date - oldest first</a>
-      <a class="dropdown-item" href="#">progress - least first</a>
-      <a class="dropdown-item" href="#">progress - most first</a>
-      <a class="dropdown-item" href="#">date - oldest first</a>
+      <!--a class="dropdown-item" href="#">log - latest first</a-->
+      <a class="dropdown-item" href="/projects/sort/newest/">created - newest first</a>
+      <a class="dropdown-item" href="/projects/sort/oldest/">created - oldest first</a>
+      <!--a class="dropdown-item" href="#">progress - least first</a-->
+      <!--a class="dropdown-item" href="#">progress - most first</a-->
     </div>
-</div-->
+</div>
 <a class="btn btn-warning" href="/projects/new/">new project</a>
 <br><br>
 {% for project in projects %}
@@ -41,7 +40,7 @@
             <!-- Card Header - Dropdown -->
             <div
                 class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary"><a href="{% url 'project_view' slug=project.slug %}">{{ project.title }}</a></h6>
+                <a href="{% url 'project_view' slug=project.slug %}"><h6 class="m-0 font-weight-bold" style="color: {{ project.color }} !important">{{ project.title }}</h6></a>
                 <div class="dropdown no-arrow">
                     <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -61,8 +60,8 @@
                     <li>{{ project.status }}</li>
                     <li>{{ project.count }} {{ project.unit }} / {{ project.goal }} {{ project.unit }}</li>
                     <div class="progress">
-                        <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"
-                        aria-valuenow="{{ project.progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ project.progress }}">
+                        <div class="progress-bar progress-bar-striped" role="progressbar"
+                        aria-valuenow="{{ project.progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ project.progress }}; background-color: {{ project.color }}">
                         {{ project.progress }} complete
                         </div>
                     </div>

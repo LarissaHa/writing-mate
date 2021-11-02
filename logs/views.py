@@ -39,6 +39,31 @@ def xdsoft_datetimepicker(request, project_slug=None):
             form = LogForm(request)
     return render(request, 'logs/xdsoft_event_form.html', {'form': form})
 
+
+def deal_with_projects(temp, user):
+    projects = [{
+        "title": p.title,
+        "status": p.status,
+        "unit": p.unit,
+        "count": Log.objects.filter(project=p, user=user).aggregate(Sum('count'))["count__sum"],
+        "goal": p.goal,
+        "slug": p.slug,
+        "synopsis": p.synopsis,
+        "subtitle": p.subtitle,
+        "progress": "0%",
+        "color": p.color,
+        "image": p.image
+    } for p in temp]
+    for p in projects:
+        if p["count"] is None:
+            continue
+        else:
+            p["progress"] = str(round((p["count"] / p["goal"] * 100), 2)) + "%"
+        if p["color"] is "":
+            p["color"] = "#6f42c1"
+    return projects
+
+
 def chart(data):
     #print(data[0])
     x = [(str(d["level"]), "") for d in data]
@@ -106,8 +131,13 @@ def welcome(request):
             log = Log.objects.filter(user=request.user, is_update=False).latest('date', 'time')
         except:
             log = None
+        try:
+            temp = Project.objects.filter(user=request.user).order_by("priority", "-created_at")
+            projects = deal_with_projects(temp, request.user)
+        except:
+            projects = None
         script, div, metrics = home_stats(request)
-        return render(request, 'logs/home.html', {'project': project, 'log': log, 'script': script, 'div': div, 'metrics': metrics})
+        return render(request, 'logs/home.html', {'project': project, 'log': log, 'script': script, 'div': div, 'metrics': metrics, 'projects': projects})
 
 
 def profile(request):
@@ -203,27 +233,16 @@ def logs2(request):
     return render(request, 'logs/logs.html', {'logs': logs})
 
 
-def projects(request):
+def projects(request, key=None):
     if request.user.is_anonymous:
         return render(request, 'logs/home.html')
-    temp = Project.objects.filter(user=request.user).order_by("-created_at")
-    projects = [{
-        "title": p.title,
-        "status": p.status,
-        "unit": p.unit,
-        "count": Log.objects.filter(project=p, user=request.user).aggregate(Sum('count'))["count__sum"],
-        "goal": p.goal,
-        "slug": p.slug,
-        "synopsis": p.synopsis,
-        "subtitle": p.subtitle,
-        "progress": "0%",
-        "image": p.image
-    } for p in temp]
-    for p in projects:
-        if p["count"] is None:
-            continue
-        else:
-            p["progress"] = str(round((p["count"] / p["goal"] * 100), 2)) + "%"
+    if key == "newest":
+        temp = Project.objects.filter(user=request.user).order_by("-created_at")
+    elif key == "oldest":
+        temp = Project.objects.filter(user=request.user).order_by("created_at")
+    else:
+        temp = Project.objects.filter(user=request.user).order_by("priority", "-created_at")
+    projects = deal_with_projects(temp, request.user)
     return render(request, 'logs/projects.html', {'projects': projects})
 
 
@@ -279,8 +298,12 @@ def project_view(request, slug):
     wc_form = wordcount_form(request, slug)
     if wc_form is None:
         return redirect('project_view', slug=project.slug)
+    color = project.color
+    if project.color == None:
+        project.color = "#6f42c1"
     return render(request, 'logs/project_view.html', {
         'project': project,
+        'color': color,
         'count': count,
         'logs': logs,
         'progress': progress,
@@ -374,13 +397,13 @@ def stats(request, mode="days"):
     elif mode == "months":
         level = "Month"
         # last 12 months
-        start_datime = timezone.localtime(timezone.now()) - timedelta(weeks=53)
+        start_datime = timezone.localtime(timezone.now()) - timedelta(weeks=51)
         for month in time_between(start_datime, timezone.localtime(timezone.now()), "monthly"):
-            stats.append({"level": month.strftime("%b %Y"), "total_count": 0})
+            stats.append({"level": month.strftime("%b"), "total_count": 0})
         temp = Log.objects.filter(user=request.user, is_update=False, date__gt=start_datime).extra(select={'day': 'date(date)'}).annotate(level=TruncMonth('date')).values('level').annotate(total_count=Sum('count'))
         for s in stats:
             for t in temp:
-                if s["level"] == t["level"].strftime('%b %Y'):
+                if s["level"] == t["level"].strftime('%b'):
                     s["total_count"] = t["total_count"]
     elif mode == "years":
         level = "Year"
@@ -394,6 +417,7 @@ def stats(request, mode="days"):
             for t in temp:
                 if s["level"] == t["level"].year:
                     s["total_count"] = t["total_count"]
+        stats = [i for n, i in enumerate(stats) if i not in stats[n + 1:]]
     else:
         level = "Day"
         # last 30 days

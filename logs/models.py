@@ -37,6 +37,19 @@ class Project(models.Model):
     pinterest = models.URLField(default="", null=True, blank=True)
     spotify = models.URLField(default="", null=True, blank=True)
     image = models.ImageField(upload_to='images', default=None, null=True, blank=True)
+    color = models.CharField(max_length=7, default="#6f42c1", null=True, blank=True)
+    PRIORITY = [
+        (1, '1 - high priority'),
+        (2, '2'),
+        (3, '3'),
+        (4, '4'),
+        (5, '5 - default'),
+        (6, '6'),
+        (7, '7'),
+        (8, '8'),
+        (9, '9 - low priority'),
+    ]
+    priority = models.IntegerField(choices=PRIORITY, default=5)
     STATUS = [
         ("prepping", 'prepping'),
         ("in progress", 'in progress'),

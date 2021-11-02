@@ -14,22 +14,22 @@ created at {{ project.created_at }}
 <div class="container-fluid">
 <div class="row">
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card shadow h-100 py-2" style="border-left: 0.25rem solid {{ project.color }} !important">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1" style="color: {{ project.color }} !important" >
                             {{ project.unit }}</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">{{ count }} / {{ project.goal }}</div>
                         <br>
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Progress</div>
+                        <div class="text-xs font-weight-bold text-uppercase mb-1" style="color: {{ project.color }} !important" >Progress</div>
                         <div class="row no-gutters align-items-center">
                             <div class="col-auto">
                                 <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ progress }}</div>
                             </div>
                             <div class="col">
                                 <div class="progress progress-sm mr-2">
-                                    <div class="progress-bar bg-primary" role="progressbar"
+                                    <div class="progress-bar" style="background-color: {{ project.color }}" role="progressbar"
                                         style="width: {{ progress }}" aria-valuenow="{{ progress }}" aria-valuemin="0"
                                         aria-valuemax="100"></div>
                                 </div>
@@ -46,11 +46,11 @@ created at {{ project.created_at }}
         </div>
     </div>
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card shadow h-100 py-2" style="border-left: 0.25rem solid {{ project.color }} !important">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Progress Today</div>
+                        <div class="text-xs font-weight-bold text-uppercase mb-1" style="color:{{ project.color }} !important" >Progress Today</div>
                         <div class="row no-gutters align-items-center">
                             {% if progress_today == "0%" %}
                             <div class="col-auto">
@@ -62,8 +62,8 @@ created at {{ project.created_at }}
                             </div>
                             <div class="col">
                                 <div class="progress progress-sm mr-2">
-                                    <div class="progress-bar bg-primary" role="progressbar"
-                                        style="width: {{ progress_today }}" aria-valuenow="{{ progress_today }}" aria-valuemin="0"
+                                    <div class="progress-bar" role="progressbar"
+                                        style="width: {{ progress_today }}; background-color: {{ project.color }};" aria-valuenow="{{ progress_today }}" aria-valuemin="0"
                                         aria-valuemax="100"></div>
                                 </div>
                             </div>
@@ -71,7 +71,7 @@ created at {{ project.created_at }}
                         </div>
                         {% if goals %}
                         <br>
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Goals</div>
+                        <div class="text-xs font-weight-bold text-uppercase mb-1" style="color:{{ project.color }} !important" >Goals</div>
                         <div class="col-auto">
                             <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ goals.daily_goal }} per day</div>
                         </div>
@@ -91,11 +91,11 @@ created at {{ project.created_at }}
         </div>
     </div>
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card shadow h-100 py-2" style="border-left: 0.25rem solid {{ project.color }} !important">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1" style="color:{{ project.color }} !important" >
                             about your project</div>
                         <div class="h7 mb-0 font-weight-bold text-gray-800">
                             <ul>
@@ -113,11 +113,11 @@ created at {{ project.created_at }}
         </div>
     </div>
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card shadow h-100 py-2" style="border-left: 0.25rem solid {{ project.color }} !important">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1" style="color:{{ project.color }} !important" >
                             number of logs in this project</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">{{ n_logs }}</div>
                         <br>
@@ -133,8 +133,8 @@ created at {{ project.created_at }}
 </div>
 <br>
 <div class="progress">
-    <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"
-    aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ progress }}">
+    <div class="progress-bar progress-bar-striped" role="progressbar" 
+    aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ progress }}; background-color: {{ project.color }}">
     {{ progress }} complete
     </div>
 </div>
@@ -149,7 +149,7 @@ created at {{ project.created_at }}
                 project image
             </div>
             <div class="card-body">
-                <img class="icons w-100 mb-3" src="{{ project.image.url }}" alt=""/>
+                <img class="icons w-100 mb-3" src="{{MEDIA_URL}}{{ project.image.url }}" alt=""/>
             </div>
         </div>
     </div>
@@ -194,12 +194,14 @@ created at {{ project.created_at }}
 {% endif %}
 <p>
 {% if project.spotify == "" or project.spotify == None %}{% else %}
-<a href="{{ project.spotify }}" target="_blank" class="btn btn-primary btn-lg btn-circle">
+<a href="{{ project.spotify }}" target="_blank" class="btn btn-lg btn-circle" style="color: #fff;
+background-color: {{ project.color }};
+border-color: {{ project.color }};">
     <i class="fab fa-spotify"></i>
 </a>
 {% endif %}
 {% if project.pinterest == "" or project.pinterest == None %}{% else %}
-<a href="{{ project.pinterest }}" target="_blank" class="btn btn-primary btn-lg btn-circle">
+<a href="{{ project.pinterest }}" target="_blank" class="btn btn-lg btn-circle" stlye="background-color: {{ project.color }}; border-color: {{ project.color }}">
     <i class="fab fa-pinterest-p"></i>
 </a>
 {% endif %}
@@ -211,7 +213,7 @@ created at {{ project.created_at }}
     <!-- Card Header - Accordion -->
     <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse"
         role="button" aria-expanded="true" aria-controls="collapseCardExample">
-        <h6 class="m-0 font-weight-bold text-primary">logs</h6>
+        <h6 class="m-0 font-weight-bold" style="color:{{ project.color }} !important" >logs</h6>
     </a>
     <!-- Card Content - Collapse -->
     <div class="collapse show" id="collapseCardExample">
@@ -241,7 +243,7 @@ created at {{ project.created_at }}
             <p>Caution! Changes here will not be reflected in any statistic or progress bar!</p>
           <form method="POST" class="log-form">{% csrf_token %}
             {{ wc_form.as_p }}
-            <button type="submit" class="save btn btn-primary">save</button>
+            <button type="submit" class="save btn" style="background-color:{{ project.color }} !important; border-color:{{ project.color }} !important" >save</button>
             <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
           </form>
         </div>

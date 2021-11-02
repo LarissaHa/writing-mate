@@ -12,6 +12,7 @@ urlpatterns = [
     path('logs/<int:pk>/edit/', views.logs_edit, name='logs_edit'),
     path('logs/<int:pk>/delete/', views.logs_delete, name='logs_delete'),
     path('projects/', views.projects, name='projects'),
+    path('projects/sort/<str:key>/', views.projects, name='projects_sort'),
     path('projects/new/', views.project_new, name='project_new'),
     path('projects/<str:slug>/', views.project_view, name='project_view'),
     path('projects/<str:slug>/edit', views.project_edit, name='project_edit'),

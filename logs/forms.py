@@ -44,6 +44,7 @@ class ProjectForm(forms.ModelForm):
             'goal',
             'unit', 
             'deadline',
+            'priority',
             'status', 
             'topic', 
             'type', 
@@ -51,5 +52,6 @@ class ProjectForm(forms.ModelForm):
             'excerpt', 
             'pinterest', 
             'spotify',
+            'color',
             'image'
         )
