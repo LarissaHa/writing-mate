@@ -59,7 +59,7 @@ def deal_with_projects(temp, user):
             continue
         else:
             p["progress"] = str(round((p["count"] / p["goal"] * 100), 2)) + "%"
-        if p["color"] is "":
+        if p["color"] == "":
             p["color"] = "#6f42c1"
     return projects
 
