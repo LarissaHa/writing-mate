@@ -36,7 +36,7 @@ created at {{ project.created_at }}
                             </div>
                         </div>
                         <br>
-                        <a href="#" data-toggle="modal" data-target="#addWordcount" class="btn btn-warning">set progress count</a>
+                        <a href="#" data-toggle="modal" data-target="#addWordcount" class="btn btn-warning" style="background-color:{{ project.color }} !important; border-color:{{ project.color }} !important" >set progress count</a>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-pen-nib fa-2x text-gray-300"></i>
@@ -104,6 +104,20 @@ created at {{ project.created_at }}
                                 <li>{{ project.type }}</li>
                             </ul>
                         </div>
+                        <p>
+                            {% if project.spotify == "" or project.spotify == None %}{% else %}
+                            <a href="{{ project.spotify }}" target="_blank" class="btn btn-lg btn-circle" style="color: #fff;
+                            background-color: {{ project.color }}; border-color: {{ project.color }};">
+                                <i class="fab fa-spotify"></i>
+                            </a>
+                            {% endif %}
+                            {% if project.pinterest == "" or project.pinterest == None %}{% else %}
+                            <a href="{{ project.pinterest }}" target="_blank" class="btn btn-lg btn-circle" style="color: #fff;
+                            background-color: {{ project.color }}; border-color: {{ project.color }};">
+                                <i class="fab fa-pinterest-p"></i>
+                            </a>
+                            {% endif %}
+                        </p>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-file-alt fa-2x text-gray-300"></i>
@@ -121,7 +135,7 @@ created at {{ project.created_at }}
                             number of logs in this project</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">{{ n_logs }}</div>
                         <br>
-                        <a class="btn btn-info" href="{% url 'logs_new' project_slug=project.slug %}">new log</a>
+                        <a class="btn btn-primary" style="background-color:{{ project.color }} !important; border-color:{{ project.color }} !important" href="{% url 'logs_new' project_slug=project.slug %}">new log</a>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-folder-open fa-2x text-gray-300"></i>
@@ -192,6 +206,7 @@ created at {{ project.created_at }}
     </div>
 </div>
 {% endif %}
+<<<<<<< Updated upstream
 <p>
 {% if project.spotify == "" or project.spotify == None %}{% else %}
 <a href="{{ project.spotify }}" target="_blank" class="btn btn-lg btn-circle" style="color: #fff;
@@ -207,6 +222,9 @@ border-color: {{ project.color }};">
 {% endif %}
 </p>
 <p><a class="btn btn-outline-warning" href="{% url 'project_edit' slug=project.slug %}">edit project</a></p>
+=======
+<p><a class="btn" style="border-color:{{ project.color }} !important; color: {{ project.color }} !important" href="{% url 'project_edit' slug=project.slug %}">edit project</a></p>
+>>>>>>> Stashed changes
 <br>
 <br>
 <div class="card shadow mb-4">
@@ -243,7 +261,7 @@ border-color: {{ project.color }};">
             <p>Caution! Changes here will not be reflected in any statistic or progress bar!</p>
           <form method="POST" class="log-form">{% csrf_token %}
             {{ wc_form.as_p }}
-            <button type="submit" class="save btn" style="background-color:{{ project.color }} !important; border-color:{{ project.color }} !important" >save</button>
+            <button type="submit" class="save btn btn-primary">save</button>
             <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
           </form>
         </div>
