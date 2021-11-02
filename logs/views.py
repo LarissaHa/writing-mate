@@ -52,6 +52,7 @@ def deal_with_projects(temp, user):
         "subtitle": p.subtitle,
         "progress": "0%",
         "color": p.color,
+        "priority": p.priority,
         "image": p.image
     } for p in temp]
     for p in projects:
