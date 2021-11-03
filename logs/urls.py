@@ -4,7 +4,7 @@ from . import views
 urlpatterns = [
     path('', views.welcome, name="welcome"),
     #path('profile/<str:user>/', views.profile, name='profile'),
-    path('profile/', views.profile, name='profile'),
+    #path('profile/', views.profile, name='profile'),
     path('logs/', views.logs, name='logs'),
     path('logs/new/', views.logs_new, name='logs_new'),
     path('logs/new/<str:project_slug>/', views.logs_new, name='logs_new'),
@@ -26,6 +26,10 @@ urlpatterns = [
     path('password_reset/', views.password_reset_request, name='password_reset'),
     path('not_allowed/', views.not_allowed, name='not_allowed'),
     path('wordcount/<str:slug>/', views.wordcount, name='wordcount'),
+    path('profile/', views.profile, name='profile'),
+    path('profile/<str:user>/', views.profile_view, name='profile_view'),
+    path('profile/<str:user>/settings', views.profile_settings, name='profile_settings'),
+    path('community/', views.community, name='community'),
     # path('xdsoft-datetimepicker/', views.xdsoft_datetimepicker, name='xdsoft'),
     # path('upload/csv/', views.upload_csv, name='upload_csv'),
 ]

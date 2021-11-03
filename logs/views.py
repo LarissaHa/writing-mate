@@ -5,7 +5,7 @@ from django.db.models.functions.datetime import TruncWeek
 from django.shortcuts import get_object_or_404, render, redirect
 from django.utils.text import slugify
 from .models import Log, Project, Profile
-from .forms import LogForm, ProjectForm, WordcountForm, LogEditForm
+from .forms import LogForm, ProfileEditForm, ProjectForm, WordcountForm#, LogEditForm
 from bokeh.plotting import figure
 from bokeh.embed import components
 from bokeh.models import ColumnDataSource, FactorRange, BoxSelectTool
@@ -30,7 +30,7 @@ def xdsoft_datetimepicker(request, project_slug=None):
             log = form.save(commit=False)
             log.user = request.user
             log.save()
-            return redirect('/logs/') #, {'profile': profile})
+            return redirect('/logs/')
     else:
         if project_slug is not None:
             project = get_object_or_404(Project, slug=project_slug)
@@ -100,6 +100,13 @@ def chart(data):
     return script, div
 
 
+def community(request):
+    profiles = Profile.objects.filter(is_public=True)
+    projects = Project.objects.filter(is_public=True)
+    logs = Log.objects.filter(is_public=True)
+    return render(request, 'logs/community.html', {'profiles': profiles, 'logs': logs, 'projects': projects})
+
+
 def not_allowed(request):
     return render(request, 'logs/not_allowed.html')
 
@@ -139,13 +146,6 @@ def welcome(request):
             projects = None
         script, div, metrics = home_stats(request)
         return render(request, 'logs/home.html', {'project': project, 'log': log, 'script': script, 'div': div, 'metrics': metrics, 'projects': projects})
-
-
-def profile(request):
-    user = Profile.objects.all()
-    print(user)
-    profile = get_object_or_404(Profile, user=request.user)
-    return render(request, 'logs/profile.html', {'profile': profile})
 
 
 def wordcount_form(request, slug):
@@ -188,7 +188,7 @@ def logs_new(request, project_slug=None):
             log.user = request.user
             log.save()
             if project_slug:
-                return redirect(f'/projects/{project_slug}') #, {'profile': profile})
+                return redirect(f'/projects/{project_slug}')
             else:
                 return redirect('/logs/')
     else:
@@ -212,7 +212,7 @@ def logs_edit(request, pk):
             log = form.save(commit=False)
             log.user = request.user
             log.save()
-            return redirect('/logs/') #, {'profile': profile})
+            return redirect('/logs/')
     else:
         form = LogEditForm(instance=log)
     return render(request, 'logs/logs_edit.html', {'form': form, "log_pk": pk})
@@ -257,7 +257,6 @@ def calc_goals(user, project):
             + (0 if count_update is None else count_update)
         )
         logs_today = Log.objects.filter(project=project, user=user, date=timezone.localtime(timezone.now()), is_update=False)
-        print(logs_today)
         if len(logs_today) <= 0:
             x = x - 1
         todo = project.goal - count
@@ -275,8 +274,12 @@ def project_view(request, slug):
     if request.user.is_anonymous:
         return render(request, 'logs/home.html')
     project = get_object_or_404(Project, slug=slug)
+    target = 'logs/project_view.html'
     if project.user != request.user:
-        return redirect('/not_allowed/')
+        if project.is_public is False:
+            return redirect('/not_allowed/')
+        else:
+            target = 'logs/project_view_others.html'
     count = Log.objects.filter(project=project, user=request.user).aggregate(Sum('count'))["count__sum"]
     logs = Log.objects.filter(project=project, user=request.user, is_update=False).order_by("-date", "-time")
     n_logs = len(logs)
@@ -302,7 +305,7 @@ def project_view(request, slug):
     color = project.color
     if project.color == None:
         project.color = "#6f42c1"
-    return render(request, 'logs/project_view.html', {
+    return render(request, target, {
         'project': project,
         'color': color,
         'count': count,
@@ -320,14 +323,14 @@ def project_new(request):
     if request.user.is_anonymous:
         return render(request, 'logs/home.html')
     if request.method == "POST":
-        form = ProjectForm(request.POST)
+        form = ProjectForm(request.POST, request.FILES)
         if form.is_valid():
             project = form.save(commit=False)
             project.user = request.user
             project.slug = slugify(str(project.user) + " " + str(project.title))
             project.created_at = timezone.localtime(timezone.now())
             project.save()
-            return redirect('project_view', slug=project.slug)  #, {'profile': profile})
+            return redirect('project_view', slug=project.slug)
     else:
         form = ProjectForm()
     return render(request, 'logs/project_new.html', {'form': form})
@@ -345,7 +348,7 @@ def project_edit(request, slug):
             project = form.save(commit=False)
             project.user = request.user
             project.save()
-            return redirect('project_view', slug=project.slug)  #, {'profile': profile})
+            return redirect('project_view', slug=project.slug)
     else:
         form = ProjectForm(instance=project)
     return render(request, 'logs/project_edit.html', {'form': form, "project_slug": slug})
@@ -527,6 +530,59 @@ def logs(request, slug=None):
         pass
 
     return redirect("/logs/")
+
+
+def profile(request):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
+    else:
+        return redirect(f'/profile/{request.user.username}/')
+
+
+def profile_view(request, user=None):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
+    if user is None:
+        user_name = request.user.username
+    else:
+        user_name = user
+    if request.user.username != user_name:
+        looking_for = get_object_or_404(User, username=user_name)
+        projects = Project.objects.filter(is_public=True, user=looking_for)
+        profile = get_object_or_404(Profile, user=looking_for, is_public=True)
+    else:
+        profile, created = Profile.objects.get_or_create(user=request.user)
+        if created is True:
+            return redirect(f'/profile/{user_name}/settings/')
+        projects = Project.objects.filter(user=request.user)
+    return render(request, 'logs/profile_view.html', {
+        'profile': profile,
+        'user_name': user_name,
+        'projects': projects
+        })
+
+
+def profile_settings(request, user=None):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
+    if user is None:
+        user_name = request.user.username
+    else:
+        user_name = user
+    if request.user.username != user_name:
+        return redirect('/not_allowed/')
+    else:
+        profile = get_object_or_404(Profile, user=request.user)
+        if request.method == "POST":
+            form = ProfileEditForm(request.POST, request.FILES, instance=profile)
+            if form.is_valid():
+                profile = form.save(commit=False)
+                profile.user = request.user
+                profile.save()
+                return redirect('profile_view', user=user_name)
+        else:
+            form = ProfileEditForm(instance=profile)
+    return render(request, 'logs/profile_settings.html', {'form': form})
 
 
 from django.shortcuts import render, redirect
