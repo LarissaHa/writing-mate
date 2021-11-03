@@ -1,0 +1,34 @@
+{% extends "blank.html" %}
+{% load static %}
+
+{% block title %}WRITING MATE{% endblock %}
+
+{% block page-heading %}user profile of {{ profile.user.first_name }}{% endblock %}
+
+{% block content %}
+
+{{ profile.profile_image }}
+{{ profile.header_image }}
+{{ profile.color }}
+{{ profile.is_public }}
+{{ profile.about_me }}
+{{ profile.pinterest }}
+{{ profile.spotify }}
+{{ profile.instagram }}
+{{ profile.twitter }}
+{{ profile.goodreads }}
+{{ profile.nanowrimo }}
+{{ profile.daily_goal }}
+{{ profile.goal_unit }}
+
+{% for p in projects %}
+
+<a href="{% url 'project_view' slug=p.slug %}">{{ p.title }}</a>
+
+{% endfor %}
+
+{% if user.username == profile.user.username %}
+<p><a class="btn" style="border-color: {{ profile.color }} !important; color: {{ profile.color }} !important" href="{% url 'profile_settings' user=user %}">edit profile settings</a></p>
+{% endif %}
+
+{% endblock %}

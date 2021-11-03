@@ -1,0 +1,24 @@
+{% extends "blank.html" %}
+{% load static %}
+
+{% block title %}WRITING MATE{% endblock %}
+
+{% block page-heading %}profile settings{% endblock %}
+
+{% block content %}
+<table>
+	<tr>
+		<td>
+			<form method="POST" enctype="multipart/form-data" class="project-form">{% csrf_token %}
+				{{ form.as_p }}
+				<button type="submit" class="save btn btn-primary">save</button>
+			</form>
+		</td>
+		<td>
+			<img class="icons w-50 mb-3" src="{% static 'logs/img/undraw_Notebook_re_id0r.svg' %}" alt=""
+			onload="SVGInject(this)" />
+
+		</td>
+	</tr>
+</table>
+{% endblock %}

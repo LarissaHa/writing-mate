@@ -1,0 +1,22 @@
+{% extends "blank.html" %}
+{% load static %}
+
+{% block title %}WRITING MATE{% endblock %}
+
+{% block page-heading %}community{% endblock %}
+
+{% block content %}
+
+{% for profile in profiles %}
+
+<a href="{% url 'profile_view' user=profile.user.username %}">{{ profile.user.first_name }}</a>
+
+{% endfor %}
+
+{% for project in projects %}
+
+<a href="{% url 'project_view' slug=project.slug %}">{{ project.title }}</a>
+
+{% endfor %}
+
+{% endblock %}
