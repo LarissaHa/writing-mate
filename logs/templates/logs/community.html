@@ -6,17 +6,36 @@
 {% block page-heading %}community{% endblock %}
 
 {% block content %}
-
-{% for profile in profiles %}
-
-<a href="{% url 'profile_view' user=profile.user.username %}">{{ profile.user.first_name }}</a>
-
-{% endfor %}
-
-{% for project in projects %}
-
-<a href="{% url 'project_view' slug=project.slug %}">{{ project.title }}</a>
-
-{% endfor %}
-
+<div class="row">
+    <!-- Users -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Community Users</h6>
+            </div>
+            <div class="card-body">
+                {% for profile in profiles %}
+                <h5 class="font-weight-bold"><a href="{% url 'profile_view' user=profile.user.username %}">{{ profile.user.first_name }}</a></h5>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6 col-lg-6">
+        <!-- Projects -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Community Projects</h6>
+            </div>
+            <div class="card-body">
+                {% if projects %}
+                {% for p in projects %}
+                <h5 class="font-weight-bold"><a href="{% url 'project_view' slug=p.slug %}">{{ p.title }}</a></h5>
+                <div class="text-xs font-weight-bold text-uppercase mb-1" >
+                    by {{ p.user.first_name }}</div><br>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -19,14 +19,14 @@ class LogEditForm(forms.ModelForm):
     
     class Meta:
         model = Log
-        fields = ('count', 'date', 'time', 'note', 'is_public')
+        fields = ('count', 'date', 'time', 'note',)
 
 class LogForm(forms.ModelForm):
     #date = forms.DateField(input_formats=['%Y-%m-%d'], widget=XDSoftDateTimePickerInput())
     
     class Meta:
         model = Log
-        fields = ('project', 'count', 'date', 'time', 'note', 'is_public')
+        fields = ('project', 'count', 'date', 'time', 'note',)
     
     def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
