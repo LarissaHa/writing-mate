@@ -100,8 +100,10 @@
                     {% endfor %}
                     {% else %}
                     <p>Sorry, there are no projects to display here...</p>
+                    {% if user.username == profile.user.username %}
                     <p>You can start with creating a new project!</p>
                     <a class="btn btn-warning" href="/projects/new/">new project</a>
+                    {% endif %}
                     {% endif %}
                 </div>
             </div>
