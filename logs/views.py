@@ -115,7 +115,7 @@ def chart(data, goal=None):
 def community(request):
     profile_pic = get_profile_image(request.user)
     profiles = Profile.objects.filter(is_public=True)
-    projects = Project.objects.filter(is_public=True)
+    projects = Project.objects.filter(is_public=True).order_by("-created_at")
     logs = Log.objects.filter(is_public=True)
     return render(request, 'logs/community.html', {'profiles': profiles, 'logs': logs, 'projects': projects, 'profile_pic': profile_pic})
 
