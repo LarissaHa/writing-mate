@@ -154,7 +154,7 @@ def imprint(request):
 
 def register(request):
     if request.user.is_anonymous:
-        return render(request, 'logs/register.html')
+        return render(request, 'registration/register.html')
     else:
         profile_pic = get_profile_image(request.user)
     return render(request, 'registration/register.html', {'profile_pic': profile_pic})
