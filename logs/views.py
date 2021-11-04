@@ -420,9 +420,12 @@ def home_stats(request):
     metrics = {"written_on_days": written_on_days, "total_count": total_count, "total_logs": total_logs}
 
     count_today = Log.objects.filter(user=request.user, date=date.today()).aggregate(Sum('count'))["count__sum"]
-    profile = get_object_or_404(Profile, user=request.user)
-    personal_goal = profile.daily_goal
-    goal_unit = profile.goal_unit
+    profile = Profile.objects.filter(user=request.user)
+    personal_goal = None
+    goal_unit = None
+    if len(profile) > 0:
+        personal_goal = profile[0].daily_goal
+        goal_unit = profile[0].goal_unit
     if count_today is None or personal_goal is None:
         progress_today = "0%"
     else:
@@ -605,7 +608,7 @@ def profile_view(request, user=None):
     else:
         profile, created = Profile.objects.get_or_create(user=request.user)
         if created is True:
-            return redirect(f'/profile/{user_name}/settings/')
+            return redirect(f'/profile/{user_name}/')
         temp = Project.objects.filter(user=request.user).order_by("priority", "-created_at")
     projects = deal_with_projects(temp, request.user)
     profile_pic = get_profile_image(request.user)

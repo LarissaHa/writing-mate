@@ -41,6 +41,7 @@
         <div class="card-body">
             <div class="row no-gutters align-items-center">
                 <div class="col mr-2">
+                    {% if progress.personal_goal %}
                     <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                         your personal goal is
                     </div>
@@ -64,10 +65,17 @@
                         </div>
                     </div>
                     <br>
+                    {% endif %}
+                    {% if progress.count_today %}
                     <div>
                         you've written {{ progress.count_today }} {{ progress.goal_unit }} today
                     </div>
+                    {% else %}
+                    <div>
+                    Nothing written today, start writing!
                     </div>
+                    {% endif %}
+                </div>
                 <div class="col-auto">
                     <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
                 </div>
@@ -172,15 +180,16 @@
         <!-- Basic Card Example -->
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Release Notes v1.1.5</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Release Notes v1.2.0</h6>
             </div>
             <div class="card-body">
                 <ul>
-                    <li>Auf der Startseite funktioniert jetzt der Project-Progress-Overview</li>
-                    <li>Projekte können ab sofort Farben haben! Default ist weiterhin das Lila, ihr könnt aber auch andere HTML-Farbcodes eingeben. Die Codes findet ihr zum Beispiel auf Seiten wie dieser hier: <a href="https://www.w3schools.com/colors/colors_picker.asp" target="_blank">Color Picker</a>. Die Farben sollten auch konsequent überall angezeigt werden, wo das Projekt aufgelistet wird.</li>
-                    <li>Projekte können jetzt Prioritäten haben! Vergebt Prioritäten von 1 (hoch) bis 9 (niedrig). Der default Wert ist 5.</li>
-                    <li>Auf der Projekt-Übersicht könnt ihr die Projekte nun nach Kriterien sortieren. Standard ist nach Priorität, ihr könnt aber auch nach dem "Created at" Datum sortieren.</li>
-                    <li>kleinere Bug-Fixes</li>
+                    <li><b>Profil-Seite:</b> Du kannst jetzt ganz einfach eine Profil-Seite für dich anlegen. Einfach rechts oben auf deinen Namen klicken, und dann auf Profil</li>
+                    <li><b>Settings: </b>Verwalte deine Einstellungen, zum Beispiel dein tägliches Schreibziel oder ob dein Profil public sein soll</li>
+                    <li><b>Schreibziel:</b> Gib dir ein tägliches Schreibziel, das auf der Homepage und in deiner Wochenübersicht angezeigt wird</li>
+                    <li><b>Öffentliche Projekte: </b>Für jedes Projekt kannst du nun einstellen, ob es von anderen gesehen werden darf.</li>
+                    <li><b>Community-Seite: </b>Stöbere durch alle öffentlichen Profile und Projekte über die Community-Seite (ist noch nicht so hübsch und noch WIP!)</li>
+                    <li>viele kleinere Bug-Fixes und Usability Enhancements (nicere Formulare und so!)</li>
                 </ul>
             </div>
         </div>
