@@ -15,7 +15,7 @@
             </div>
             <div class="card-body">
                 {% for profile in profiles %}
-                <h5 class="font-weight-bold"><a href="{% url 'profile_view' user=profile.user.username %}">{{ profile.user.first_name }} ({{ profile.user.username }})</a></h5>
+                <h5 class="font-weight-bold"><a href="{% url 'profile_view' user=profile.user.username %}">{{ profile.user.username }}</a></h5>
                 {% endfor %}
             </div>
         </div>
@@ -31,7 +31,7 @@
                 {% for p in projects %}
                 <h5 class="font-weight-bold"><a href="{% url 'project_view' slug=p.slug %}">{{ p.title }}</a></h5>
                 <div class="text-xs font-weight-bold text-uppercase mb-1" >
-                    by {{ p.user.first_name }}</div><br>
+                    by {{ p.user.username }}</div><br>
                 {% endfor %}
                 {% endif %}
             </div>
