@@ -121,27 +121,42 @@ def community(request):
 
 
 def not_allowed(request):
-    profile_pic = get_profile_image(request.user)
+    if request.user.is_anonymous:
+        return render(request, 'logs/not_allowed.html')
+    else:
+        profile_pic = get_profile_image(request.user)
     return render(request, 'logs/not_allowed.html', {'profile_pic': profile_pic})
 
 
 def contact(request):
-    profile_pic = get_profile_image(request.user)
+    if request.user.is_anonymous:
+        return render(request, 'logs/contact.html')
+    else:
+        profile_pic = get_profile_image(request.user)
     return render(request, 'logs/contact.html', {'profile_pic': profile_pic})
 
 
 def release_notes(request):
-    profile_pic = get_profile_image(request.user)
+    if request.user.is_anonymous:
+        return render(request, 'logs/release_notes.html')
+    else:
+        profile_pic = get_profile_image(request.user)
     return render(request, 'logs/release_notes.html', {'profile_pic': profile_pic})
 
 
 def imprint(request):
-    profile_pic = get_profile_image(request.user)
+    if request.user.is_anonymous:
+        return render(request, 'logs/imprint.html')
+    else:
+        profile_pic = get_profile_image(request.user)
     return render(request, 'logs/imprint.html', {'profile_pic': profile_pic})
 
 
 def register(request):
-    profile_pic = get_profile_image(request.user)
+    if request.user.is_anonymous:
+        return render(request, 'logs/register.html')
+    else:
+        profile_pic = get_profile_image(request.user)
     return render(request, 'registration/register.html', {'profile_pic': profile_pic})
 
 
