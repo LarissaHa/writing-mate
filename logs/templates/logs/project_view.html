@@ -98,14 +98,14 @@ created at {{ project.created_at }}
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-uppercase mb-1" style="color:{{ project.color }} !important" >
                             about your project</div>
-                        <div class="h7 mb-0 font-weight-bold text-gray-800">
+                        <p>
                             <ul>
                                 <li>{{ project.status }}</li>
                                 <li>{{ project.topic }}</li>
                                 <li>{{ project.type }}</li>
                                 <li>Prio {{ project.priority }}</li>
                             </ul>
-                        </div>
+                        </p>
                         <p>
                             {% if project.spotify == "" or project.spotify == None %}{% else %}
                             <a href="{{ project.spotify }}" target="_blank" class="btn btn-lg btn-circle" style="color: #fff;
@@ -175,9 +175,13 @@ created at {{ project.created_at }}
                 further info
             </div>
             <div class="card-body">
-                synopsis:
+                <div class="h7 mb-0 font-weight-bold text-gray-800">
+                    synopsis:
+                </div>
                 <p>{{ project.synopsis }}</p>
-                excerpt:
+                <div class="h7 mb-0 font-weight-bold text-gray-800">
+                    excerpt:
+                </div>
                 <p>{{ project.excerpt }}</p>
             </div>
         </div>

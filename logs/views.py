@@ -5,10 +5,10 @@ from django.db.models.functions.datetime import TruncWeek
 from django.shortcuts import get_object_or_404, render, redirect
 from django.utils.text import slugify
 from .models import Log, Project, Profile
-from .forms import LogForm, ProjectForm, WordcountForm, LogEditForm
+from .forms import LogForm, ProfileEditForm, ProjectForm, WordcountForm, LogEditForm
 from bokeh.plotting import figure
 from bokeh.embed import components
-from bokeh.models import ColumnDataSource, FactorRange, BoxSelectTool
+from bokeh.models import ColumnDataSource, FactorRange, BoxSelectTool, Span
 from bokeh.palettes import Spectral6, magma
 from bokeh.models import LinearColorMapper
 from bokeh.transform import factor_cmap
@@ -30,7 +30,7 @@ def xdsoft_datetimepicker(request, project_slug=None):
             log = form.save(commit=False)
             log.user = request.user
             log.save()
-            return redirect('/logs/') #, {'profile': profile})
+            return redirect('/logs/')
     else:
         if project_slug is not None:
             project = get_object_or_404(Project, slug=project_slug)
@@ -65,7 +65,16 @@ def deal_with_projects(temp, user):
     return projects
 
 
-def chart(data):
+def get_profile_image(user):
+    profile = Profile.objects.filter(user=user)
+    try:
+        image = profile[0].profile_image.url
+    except:
+        image = ""
+    return image
+
+
+def chart(data, goal=None):
     #print(data[0])
     x = [(str(d["level"]), "") for d in data]
     levels = [str(d["level"]) for d in data]
@@ -81,6 +90,9 @@ def chart(data):
     plot.add_tools(BoxSelectTool(dimensions="width"))
     # plot.add_tools(WheelZoomTool())
     source = ColumnDataSource(data=dict(x=x, counts=counts, levels=levels))
+    if goal:
+        hline = Span(location=goal, dimension='width', line_color='gray', line_width=3)
+        plot.renderers.extend([hline])
     plot.vbar(
         x='x',
         top='counts',
@@ -100,30 +112,44 @@ def chart(data):
     return script, div
 
 
+def community(request):
+    profile_pic = get_profile_image(request.user)
+    profiles = Profile.objects.filter(is_public=True)
+    projects = Project.objects.filter(is_public=True)
+    logs = Log.objects.filter(is_public=True)
+    return render(request, 'logs/community.html', {'profiles': profiles, 'logs': logs, 'projects': projects, 'profile_pic': profile_pic})
+
+
 def not_allowed(request):
-    return render(request, 'logs/not_allowed.html')
+    profile_pic = get_profile_image(request.user)
+    return render(request, 'logs/not_allowed.html', {'profile_pic': profile_pic})
 
 
 def contact(request):
-    return render(request, 'logs/contact.html')
+    profile_pic = get_profile_image(request.user)
+    return render(request, 'logs/contact.html', {'profile_pic': profile_pic})
 
 
 def release_notes(request):
-    return render(request, 'logs/release_notes.html')
+    profile_pic = get_profile_image(request.user)
+    return render(request, 'logs/release_notes.html', {'profile_pic': profile_pic})
 
 
 def imprint(request):
-    return render(request, 'logs/imprint.html')
+    profile_pic = get_profile_image(request.user)
+    return render(request, 'logs/imprint.html', {'profile_pic': profile_pic})
 
 
 def register(request):
-    return render(request, 'registration/register.html')
+    profile_pic = get_profile_image(request.user)
+    return render(request, 'registration/register.html', {'profile_pic': profile_pic})
 
 
 def welcome(request):
     if request.user.is_anonymous:
         return render(request, 'logs/home.html')
     else:
+        profile_pic = get_profile_image(request.user)
         try:
             project = Project.objects.filter(user=request.user).latest('created_at')
         except:
@@ -137,15 +163,17 @@ def welcome(request):
             projects = deal_with_projects(temp, request.user)
         except:
             projects = None
-        script, div, metrics = home_stats(request)
-        return render(request, 'logs/home.html', {'project': project, 'log': log, 'script': script, 'div': div, 'metrics': metrics, 'projects': projects})
-
-
-def profile(request):
-    user = Profile.objects.all()
-    print(user)
-    profile = get_object_or_404(Profile, user=request.user)
-    return render(request, 'logs/profile.html', {'profile': profile})
+        script, div, metrics, progress = home_stats(request)
+        return render(request, 'logs/home.html', {
+            'project': project, 
+            'log': log, 
+            'script': script, 
+            'div': div, 
+            'metrics': metrics, 
+            'projects': projects, 
+            'profile_pic': profile_pic,
+            'progress': progress
+        })
 
 
 def wordcount_form(request, slug):
@@ -174,8 +202,9 @@ def wordcount_form(request, slug):
 def wordcount(request, slug):
     if request.user.is_anonymous:
         return render(request, 'logs/home.html')
+    profile_pic = get_profile_image(request.user)
     form = wordcount_form(request, slug)
-    return render(request, 'logs/wordcount.html', {'wc_form': form})
+    return render(request, 'logs/wordcount.html', {'wc_form': form, 'profile_pic': profile_pic})
 
 
 def logs_new(request, project_slug=None):
@@ -188,7 +217,7 @@ def logs_new(request, project_slug=None):
             log.user = request.user
             log.save()
             if project_slug:
-                return redirect(f'/projects/{project_slug}') #, {'profile': profile})
+                return redirect(f'/projects/{project_slug}')
             else:
                 return redirect('/logs/')
     else:
@@ -197,7 +226,8 @@ def logs_new(request, project_slug=None):
             form = LogForm(request, initial={'project': project, 'date': date.today(), 'time': timezone.localtime(timezone.now())})
         else:
             form = LogForm(request, initial={'date': date.today(), 'time': timezone.localtime(timezone.now())})
-    return render(request, 'logs/logs_new.html', {'form': form})
+    profile_pic = get_profile_image(request.user)
+    return render(request, 'logs/logs_new.html', {'form': form, 'profile_pic': profile_pic})
 
 
 def logs_edit(request, pk):
@@ -212,10 +242,11 @@ def logs_edit(request, pk):
             log = form.save(commit=False)
             log.user = request.user
             log.save()
-            return redirect('/logs/') #, {'profile': profile})
+            return redirect('/logs/')
     else:
         form = LogEditForm(instance=log)
-    return render(request, 'logs/logs_edit.html', {'form': form, "log_pk": pk})
+    profile_pic = get_profile_image(request.user)
+    return render(request, 'logs/logs_edit.html', {'form': form, "log_pk": pk, 'profile_pic': profile_pic})
 
 
 def logs_delete(request, pk):
@@ -225,13 +256,15 @@ def logs_delete(request, pk):
     if to_delete.user != request.user:
         return redirect(request, 'logs/not_allowed.html')
     to_delete.delete()
-    return(render(request, 'logs/deleted_successfully.html'))
+    profile_pic = get_profile_image(request.user)
+    return render(request, 'logs/deleted_successfully.html', {'profile_pic': profile_pic})
 
 
 def logs2(request):
     print(request.user)
     logs = Log.objects.filter(user=request.user).order_by("date")
-    return render(request, 'logs/logs.html', {'logs': logs})
+    profile_pic = get_profile_image(request.user)
+    return render(request, 'logs/logs.html', {'logs': logs, 'profile_pic': profile_pic})
 
 
 def projects(request, key=None):
@@ -244,7 +277,8 @@ def projects(request, key=None):
     else:
         temp = Project.objects.filter(user=request.user).order_by("priority", "-created_at")
     projects = deal_with_projects(temp, request.user)
-    return render(request, 'logs/projects.html', {'projects': projects})
+    profile_pic = get_profile_image(request.user)
+    return render(request, 'logs/projects.html', {'projects': projects, 'profile_pic': profile_pic})
 
 
 def calc_goals(user, project):
@@ -257,7 +291,6 @@ def calc_goals(user, project):
             + (0 if count_update is None else count_update)
         )
         logs_today = Log.objects.filter(project=project, user=user, date=timezone.localtime(timezone.now()), is_update=False)
-        print(logs_today)
         if len(logs_today) <= 0:
             x = x - 1
         todo = project.goal - count
@@ -275,10 +308,14 @@ def project_view(request, slug):
     if request.user.is_anonymous:
         return render(request, 'logs/home.html')
     project = get_object_or_404(Project, slug=slug)
+    target = 'logs/project_view.html'
     if project.user != request.user:
-        return redirect('/not_allowed/')
-    count = Log.objects.filter(project=project, user=request.user).aggregate(Sum('count'))["count__sum"]
-    logs = Log.objects.filter(project=project, user=request.user, is_update=False).order_by("-date", "-time")
+        if project.is_public is False:
+            return redirect('/not_allowed/')
+        else:
+            target = 'logs/project_view_others.html'
+    count = Log.objects.filter(project=project).aggregate(Sum('count'))["count__sum"]
+    logs = Log.objects.filter(project=project, is_update=False).order_by("-date", "-time")
     n_logs = len(logs)
     logs = logs[:5]
     if count is None:
@@ -286,7 +323,7 @@ def project_view(request, slug):
     else:
         progress = str(round((count / project.goal * 100), 2)) + "%"
     goals = calc_goals(request.user, project)
-    count_today = Log.objects.filter(project=project, user=request.user, date=timezone.localtime(timezone.now()), is_update=False).aggregate(Sum('count'))["count__sum"]
+    count_today = Log.objects.filter(project=project, date=timezone.localtime(timezone.now()), is_update=False).aggregate(Sum('count'))["count__sum"]
     if count_today is None or goals is None:
         progress_today = "0%"
     else:
@@ -302,7 +339,8 @@ def project_view(request, slug):
     color = project.color
     if project.color == None:
         project.color = "#6f42c1"
-    return render(request, 'logs/project_view.html', {
+    profile_pic = get_profile_image(request.user)
+    return render(request, target, {
         'project': project,
         'color': color,
         'count': count,
@@ -312,7 +350,8 @@ def project_view(request, slug):
         'goals': goals,
         'count_today': count_today,
         'progress_today': progress_today,
-        'wc_form': wc_form
+        'wc_form': wc_form, 
+        'profile_pic': profile_pic
     })
 
 
@@ -320,17 +359,18 @@ def project_new(request):
     if request.user.is_anonymous:
         return render(request, 'logs/home.html')
     if request.method == "POST":
-        form = ProjectForm(request.POST)
+        form = ProjectForm(request.POST, request.FILES)
         if form.is_valid():
             project = form.save(commit=False)
             project.user = request.user
             project.slug = slugify(str(project.user) + " " + str(project.title))
             project.created_at = timezone.localtime(timezone.now())
             project.save()
-            return redirect('project_view', slug=project.slug)  #, {'profile': profile})
+            return redirect('project_view', slug=project.slug)
     else:
         form = ProjectForm()
-    return render(request, 'logs/project_new.html', {'form': form})
+    profile_pic = get_profile_image(request.user)
+    return render(request, 'logs/project_new.html', {'form': form, 'profile_pic': profile_pic})
 
 
 def project_edit(request, slug):
@@ -345,10 +385,11 @@ def project_edit(request, slug):
             project = form.save(commit=False)
             project.user = request.user
             project.save()
-            return redirect('project_view', slug=project.slug)  #, {'profile': profile})
+            return redirect('project_view', slug=project.slug)
     else:
         form = ProjectForm(instance=project)
-    return render(request, 'logs/project_edit.html', {'form': form, "project_slug": slug})
+    profile_pic = get_profile_image(request.user)
+    return render(request, 'logs/project_edit.html', {'form': form, "project_slug": slug, 'profile_pic': profile_pic})
 
 
 def project_delete(request, slug):
@@ -358,7 +399,8 @@ def project_delete(request, slug):
     if to_delete.user != request.user:
         return redirect(request, 'logs/not_allowed.html')
     to_delete.delete()
-    return(render(request, 'logs/deleted_successfully.html'))
+    profile_pic = get_profile_image(request.user)
+    return render(request, 'logs/deleted_successfully.html', {'profile_pic': profile_pic})
 
 
 def home_stats(request):
@@ -371,13 +413,24 @@ def home_stats(request):
         for t in temp:
             if s["level"] == t["level"].strftime("%A"):
                 s["total_count"] = t["total_count"]
-    script, div = chart(stats)
     logs = Log.objects.filter(user=request.user, is_update=False).extra(select={'level': 'date(date)'}).values('level')
     written_on_days = len(logs.distinct())
     total_count = sum([l["total_count"] for l in logs.annotate(total_count=Sum('count'))])
     total_logs = logs.count()
     metrics = {"written_on_days": written_on_days, "total_count": total_count, "total_logs": total_logs}
-    return script, div, metrics
+
+    count_today = Log.objects.filter(user=request.user, date=date.today()).aggregate(Sum('count'))["count__sum"]
+    profile = get_object_or_404(Profile, user=request.user)
+    personal_goal = profile.daily_goal
+    goal_unit = profile.goal_unit
+    if count_today is None or personal_goal is None:
+        progress_today = "0%"
+    else:
+        progress_today = str(round((count_today / personal_goal * 100), 2)) + "%"
+    progress = {"personal_goal": personal_goal, "count_today": count_today, "progress_today": progress_today, "goal_unit": goal_unit}
+
+    script, div = chart(stats, personal_goal)
+    return script, div, metrics, progress
 
 
 def stats(request, mode="days"):
@@ -437,10 +490,11 @@ def stats(request, mode="days"):
     total_logs = logs.count()
     metrics = {"written_on_days": written_on_days, "total_count": total_count, "total_logs": total_logs}
     script, div = chart(stats)
+    profile_pic = get_profile_image(request.user)
     return render(
         request,
         'logs/stats.html',
-        {'script': script, 'div': div, 'stats': stats, 'level': level, 'metrics': metrics}
+        {'script': script, 'div': div, 'stats': stats, 'level': level, 'metrics': metrics, 'profile_pic': profile_pic}
     )
 
 
@@ -448,16 +502,17 @@ def logs(request, slug=None):
     if request.user.is_anonymous:
         return render(request, 'logs/home.html')
     projects = Project.objects.filter(user=request.user).order_by("-created_at")
+    profile_pic = get_profile_image(request.user)
     if "GET" == request.method:
         if slug is None:
             logs = Log.objects.filter(user=request.user, is_update=False).order_by("-date", "-time")[:20]
             filtered_by = "filter by project"
-            return render(request, 'logs/logs.html', {'logs': logs, 'projects': projects, 'filtered_by': filtered_by})
+            return render(request, 'logs/logs.html', {'logs': logs, 'projects': projects, 'filtered_by': filtered_by, 'profile_pic': profile_pic})
         else:
             project = get_object_or_404(Project, slug=slug, user=request.user)
             filtered_by = project.title
             logs = Log.objects.filter(project=project, user=request.user, is_update=False).order_by("-date", "-time")[:20]
-            return render(request, 'logs/logs.html', {'logs': logs, 'projects': projects, 'filtered_by': filtered_by})
+            return render(request, 'logs/logs.html', {'logs': logs, 'projects': projects, 'filtered_by': filtered_by, 'profile_pic': profile_pic})
             # return render(request, "logs/logs.html", data)
     # if not GET, then proceed
     try:
@@ -527,6 +582,67 @@ def logs(request, slug=None):
         pass
 
     return redirect("/logs/")
+
+
+def profile(request):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
+    else:
+        return redirect(f'/profile/{request.user.username}/')
+
+
+def profile_view(request, user=None):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
+    if user is None:
+        user_name = request.user.username
+    else:
+        user_name = user
+    if request.user.username != user_name:
+        looking_for = get_object_or_404(User, username=user_name)
+        temp = Project.objects.filter(is_public=True, user=looking_for).order_by("priority", "-created_at")
+        profile = get_object_or_404(Profile, user=looking_for, is_public=True)
+    else:
+        profile, created = Profile.objects.get_or_create(user=request.user)
+        if created is True:
+            return redirect(f'/profile/{user_name}/settings/')
+        temp = Project.objects.filter(user=request.user).order_by("priority", "-created_at")
+    projects = deal_with_projects(temp, request.user)
+    profile_pic = get_profile_image(request.user)
+    profile_color = profile.color
+    if profile_color == "" or profile_color is None:
+        profile_color = "#6f42c1"
+    return render(request, 'logs/profile_view.html', {
+        'profile': profile,
+        'profile_color': profile_color,
+        'user_name': user_name,
+        'projects': projects,
+        'profile_pic': profile_pic
+    })
+
+
+def profile_settings(request, user=None):
+    if request.user.is_anonymous:
+        return render(request, 'logs/home.html')
+    if user is None:
+        user_name = request.user.username
+    else:
+        user_name = user
+    if request.user.username != user_name:
+        return redirect('/not_allowed/')
+    else:
+        profile = get_object_or_404(Profile, user=request.user)
+        if request.method == "POST":
+            form = ProfileEditForm(request.POST, request.FILES, instance=profile)
+            if form.is_valid():
+                profile = form.save(commit=False)
+                profile.user = request.user
+                profile.save()
+                return redirect('profile_view', user=user_name)
+        else:
+            form = ProfileEditForm(instance=profile)
+    profile_pic = get_profile_image(request.user)
+    return render(request, 'logs/profile_settings.html', {'form': form, 'profile_pic': profile_pic})
 
 
 from django.shortcuts import render, redirect

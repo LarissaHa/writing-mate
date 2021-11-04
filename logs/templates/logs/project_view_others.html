@@ -1,0 +1,175 @@
+{% extends "blank.html" %}
+{% load static %}
+
+{% block title %}WRITING MATE{% endblock %}
+
+{% block page-heading %}{{ project.title }}{% endblock %}
+
+{% block content %}
+{% if project.subtitle %}
+<h5>{{ project.subtitle }}</h5>
+{% else %} {% endif %}
+created at {{ project.created_at }}
+<br>
+<div class="container-fluid">
+<br>
+<div class="progress">
+    <div class="progress-bar progress-bar-striped" role="progressbar" 
+    aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ progress }}; background-color: {{ project.color }}">
+    {{ progress }} complete
+    </div>
+</div>
+<br>
+<br>
+{% if project.image %}
+<div class="row">
+    <div class="col-lg-6">
+        <!-- Default Card Example -->
+        <div class="card mb-4">
+            <div class="card-header">
+                project image
+            </div>
+            <div class="card-body">
+                <img class="icons w-100 mb-3" src="{{MEDIA_URL}}{{ project.image.url }}" alt=""/>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="mb-4">
+            <div class="card shadow h-100 py-2" style="border-left: 0.25rem solid {{ project.color }} !important">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1" style="color:{{ project.color }} !important" >
+                                about this project</div>
+                            <div class="h7 mb-0 font-weight-bold text-gray-800">
+                                by {{ project.user.first_name }} ({{ project.user.username }})
+                            </div>
+                            <p>
+                                <ul>
+                                    <li>{{ project.status }}</li>
+                                    <li>{{ project.topic }}</li>
+                                    <li>{{ project.type }}</li>
+                                </ul>
+                            </p>
+                            <p>
+                                {% if project.spotify == "" or project.spotify == None %}{% else %}
+                                <a href="{{ project.spotify }}" target="_blank" class="btn btn-lg btn-circle" style="color: #fff;
+                                background-color: {{ project.color }}; border-color: {{ project.color }};">
+                                    <i class="fab fa-spotify"></i>
+                                </a>
+                                {% endif %}
+                                {% if project.pinterest == "" or project.pinterest == None %}{% else %}
+                                <a href="{{ project.pinterest }}" target="_blank" class="btn btn-lg btn-circle" style="color: #fff;
+                                background-color: {{ project.color }}; border-color: {{ project.color }};">
+                                    <i class="fab fa-pinterest-p"></i>
+                                </a>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-header">
+                further info
+            </div>
+            <div class="card-body">
+                <div class="h7 mb-0 font-weight-bold text-gray-800">
+                    synopsis:
+                </div>
+                <p>{{ project.synopsis }}</p>
+                <div class="h7 mb-0 font-weight-bold text-gray-800">
+                    excerpt:
+                </div>
+                <p>{{ project.excerpt }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row">
+    <div class="col-lg-6 col-md-6 mb-4">
+        <div class="card shadow h-100 py-2" style="border-left: 0.25rem solid {{ project.color }} !important">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1" style="color:{{ project.color }} !important" >
+                            about this project</div>
+                        <div class="h7 mb-0 font-weight-bold text-gray-800">
+                            by {{ project.user.first_name }} ({{ project.user.username }})
+                        </div>
+                        <p>
+                            <ul>
+                                <li>{{ project.status }}</li>
+                                <li>{{ project.topic }}</li>
+                                <li>{{ project.type }}</li>
+                            </ul>
+                        </p>
+                        <p>
+                            {% if project.spotify == "" or project.spotify == None %}{% else %}
+                            <a href="{{ project.spotify }}" target="_blank" class="btn btn-lg btn-circle" style="color: #fff;
+                            background-color: {{ project.color }}; border-color: {{ project.color }};">
+                                <i class="fab fa-spotify"></i>
+                            </a>
+                            {% endif %}
+                            {% if project.pinterest == "" or project.pinterest == None %}{% else %}
+                            <a href="{{ project.pinterest }}" target="_blank" class="btn btn-lg btn-circle" style="color: #fff;
+                            background-color: {{ project.color }}; border-color: {{ project.color }};">
+                                <i class="fab fa-pinterest-p"></i>
+                            </a>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <!-- Default Card Example -->
+        <div class="card mb-4">
+            <div class="card-header">
+                synopsis
+            </div>
+            <div class="card-body">
+                <p>{{ project.synopsis }}</p>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-header">
+                excerpt
+            </div>
+            <div class="card-body">
+                <p>{{ project.excerpt }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!--div class="card shadow mb-4">
+    <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse"
+        role="button" aria-expanded="true" aria-controls="collapseCardExample">
+        <h6 class="m-0 font-weight-bold" style="color:{{ project.color }} !important" >logs</h6>
+    </a>
+    <div class="collapse show" id="collapseCardExample">
+        <div class="card-body">
+            <table>
+                {% for log in logs %}
+                <tr>
+                    <td style="padding: 15px;"><a class="btn btn-outline-info" href="{% url 'logs_edit' pk=log.pk %}">edit</a></td><td> {{ log.project }} - {{ log.count }} - {{ log.date }}, {{ log.time }} - {{ log.note }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+</div-->
+{% endblock %}

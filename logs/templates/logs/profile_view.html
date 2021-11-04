@@ -1,0 +1,116 @@
+{% extends "blank.html" %}
+{% load static %}
+
+{% block title %}WRITING MATE{% endblock %}
+
+{% block page-heading %}user profile of {{ profile.user.first_name }}{% endblock %}
+
+{% block content %}
+{% if profile.header_image %}
+<p><img class="col-xl" src="{{MEDIA_URL}}{{ profile.header_image.url }}"></p>
+{% endif %}
+<div class="row">
+    <!-- Profile image -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                {% if profile.profile_image %}
+                <img class="col-xl" src="{{MEDIA_URL}}{{ profile.profile_image.url }}">
+                {% else %}
+                <img class="col-xl" src="{% static 'logs/img/undraw_people_tax5.svg' %}">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-8 col-lg-7">
+        <!-- Profile Info -->
+        <div class="mb-4">
+            <div class="card shadow h-100 py-2" style="border-left: 0.25rem solid {{ profile_color }} !important">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <p>
+                                {% if profile.spotify == "" or profile.spotify == None %}{% else %}
+                                <a href="{{ profile.spotify }}" target="_blank" class="btn btn-lg btn-circle" style="color: #fff;
+                                background-color: {{ profile_color }}; border-color: {{ profile_color }};">
+                                    <i class="fab fa-spotify"></i>
+                                </a>
+                                {% endif %}
+                                {% if profile.pinterest == "" or profile.pinterest == None %}{% else %}
+                                <a href="{{ profile.pinterest }}" target="_blank" class="btn btn-lg btn-circle" style="color: #fff;
+                                background-color: {{ profile_color }}; border-color: {{ profile_color }};">
+                                    <i class="fab fa-pinterest"></i>
+                                </a>
+                                {% endif %}
+                                {% if profile.instagram == "" or profile.instagram == None %}{% else %}
+                                <a href="{{ profile.instagram }}" target="_blank" class="btn btn-lg btn-circle" style="color: #fff;
+                                background-color: {{ profile_color }}; border-color: {{ profile_color }};">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                {% endif %}
+                                {% if profile.twitter == "" or profile.twitter == None %}{% else %}
+                                <a href="{{ profile.twitter }}" target="_blank" class="btn btn-lg btn-circle" style="color: #fff;
+                                background-color: {{ profile_color }}; border-color: {{ profile_color }};">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                {% endif %}
+                                {% if profile.goodreads == "" or profile.goodreads == None %}{% else %}
+                                <a href="{{ profile.goodreads }}" target="_blank" class="btn btn-lg btn-circle" style="color: #fff;
+                                background-color: {{ profile_color }}; border-color: {{ profile_color }};">
+                                    <i class="fab fa-goodreads"></i>
+                                </a>
+                                {% endif %}
+                                {% if profile.nanowrimo == "" or profile.nanowrimo == None %}{% else %}
+                                <a href="{{ profile.nanowrimo }}" target="_blank" class="btn btn-lg btn-circle" style="color: #fff;
+                                background-color: {{ profile_color }}; border-color: {{ profile_color }};">
+                                    <i class="fab fa-nanowrimo"></i>
+                                </a>
+                                {% endif %}
+                            </p>
+                            <div class="text-xs font-weight-bold text-uppercase mb-1" style="color:{{ profile_color }} !important" >
+                                about yourself</div>
+                            <div class="h7 mb-0 font-weight-bold text-gray-800">
+                                {{ profile.about_me }}
+                            </div>
+                            <p>
+                            </p>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Project Overview -->
+        <div class="mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold" style="color: {{ profile_color }} !important" >Projects</h6>
+                </div>
+                <div class="card-body">
+                    {% if projects %}
+                    {% for p in projects %}
+                    <h4 class="small font-weight-bold"><a href="{% url 'project_view' slug=p.slug %}">{{ p.title }}</a><span
+                            class="float-right">{{ p.progress }}</span></h4>
+                    <div class="progress mb-4">
+                        <div class="progress-bar" role="progressbar" style="width: {{ p.progress }}; background-color: {{ p.color }};"
+                            aria-valuenow="{{ p.progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p>Sorry, there are no projects to display here...</p>
+                    <p>You can start with creating a new project!</p>
+                    <a class="btn btn-warning" href="/projects/new/">new project</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if user.username == profile.user.username %}
+<p><a class="btn" style="border-color: {{ profile_color }} !important; color: {{ profile_color }} !important" href="{% url 'profile_settings' user=user %}">edit profile settings</a></p>
+{% endif %}
+
+{% endblock %}
