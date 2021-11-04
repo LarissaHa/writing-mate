@@ -8,7 +8,7 @@ from .models import Log, Project, Profile
 from .forms import LogForm, ProfileEditForm, ProjectForm, WordcountForm, LogEditForm
 from bokeh.plotting import figure
 from bokeh.embed import components
-from bokeh.models import ColumnDataSource, FactorRange, BoxSelectTool
+from bokeh.models import ColumnDataSource, FactorRange, BoxSelectTool, Span
 from bokeh.palettes import Spectral6, magma
 from bokeh.models import LinearColorMapper
 from bokeh.transform import factor_cmap
@@ -74,7 +74,7 @@ def get_profile_image(user):
     return image
 
 
-def chart(data):
+def chart(data, goal=None):
     #print(data[0])
     x = [(str(d["level"]), "") for d in data]
     levels = [str(d["level"]) for d in data]
@@ -90,6 +90,9 @@ def chart(data):
     plot.add_tools(BoxSelectTool(dimensions="width"))
     # plot.add_tools(WheelZoomTool())
     source = ColumnDataSource(data=dict(x=x, counts=counts, levels=levels))
+    if goal:
+        hline = Span(location=goal, dimension='width', line_color='gray', line_width=3)
+        plot.renderers.extend([hline])
     plot.vbar(
         x='x',
         top='counts',
@@ -160,8 +163,17 @@ def welcome(request):
             projects = deal_with_projects(temp, request.user)
         except:
             projects = None
-        script, div, metrics = home_stats(request)
-        return render(request, 'logs/home.html', {'project': project, 'log': log, 'script': script, 'div': div, 'metrics': metrics, 'projects': projects, 'profile_pic': profile_pic})
+        script, div, metrics, progress = home_stats(request)
+        return render(request, 'logs/home.html', {
+            'project': project, 
+            'log': log, 
+            'script': script, 
+            'div': div, 
+            'metrics': metrics, 
+            'projects': projects, 
+            'profile_pic': profile_pic,
+            'progress': progress
+        })
 
 
 def wordcount_form(request, slug):
@@ -401,13 +413,24 @@ def home_stats(request):
         for t in temp:
             if s["level"] == t["level"].strftime("%A"):
                 s["total_count"] = t["total_count"]
-    script, div = chart(stats)
     logs = Log.objects.filter(user=request.user, is_update=False).extra(select={'level': 'date(date)'}).values('level')
     written_on_days = len(logs.distinct())
     total_count = sum([l["total_count"] for l in logs.annotate(total_count=Sum('count'))])
     total_logs = logs.count()
     metrics = {"written_on_days": written_on_days, "total_count": total_count, "total_logs": total_logs}
-    return script, div, metrics
+
+    count_today = Log.objects.filter(user=request.user, date=date.today()).aggregate(Sum('count'))["count__sum"]
+    profile = get_object_or_404(Profile, user=request.user)
+    personal_goal = profile.daily_goal
+    goal_unit = profile.goal_unit
+    if count_today is None or personal_goal is None:
+        progress_today = "0%"
+    else:
+        progress_today = str(round((count_today / personal_goal * 100), 2)) + "%"
+    progress = {"personal_goal": personal_goal, "count_today": count_today, "progress_today": progress_today, "goal_unit": goal_unit}
+
+    script, div = chart(stats, personal_goal)
+    return script, div, metrics, progress
 
 
 def stats(request, mode="days"):
