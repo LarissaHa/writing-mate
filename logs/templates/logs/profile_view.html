@@ -63,7 +63,13 @@
                                 {% if profile.nanowrimo == "" or profile.nanowrimo == None %}{% else %}
                                 <a href="{{ profile.nanowrimo }}" target="_blank" class="btn btn-lg btn-circle" style="color: #fff;
                                 background-color: {{ profile_color }}; border-color: {{ profile_color }};">
-                                    <i class="fas fa-link"></i>
+                                    <i class="fas fa-dragon"></i>
+                                </a>
+                                {% endif %}
+                                {% if profile.wattpad == "" or profile.wattpad == None %}{% else %}
+                                <a href="{{ profile.wattpad }}" target="_blank" class="btn btn-lg btn-circle" style="color: #fff;
+                                background-color: {{ profile_color }}; border-color: {{ profile_color }};">
+                                    <i class="fab fa-weebly"></i>
                                 </a>
                                 {% endif %}
                             </p>

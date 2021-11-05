@@ -20,6 +20,7 @@ class Profile(models.Model):
     twitter = models.URLField(default="", verbose_name="Twitter", help_text="insert your twitter profile URL", null=True, blank=True)
     goodreads = models.URLField(default="", verbose_name="Goodreads", help_text="insert your goodreads profile URL", null=True, blank=True)
     nanowrimo = models.URLField(default="", verbose_name="NaNoWriMo.org", help_text="insert your nanowrimo.org profile URL", null=True, blank=True)
+    wattpad = models.URLField(default="", verbose_name="Wattpad", help_text="insert your wattpad profile URL", null=True, blank=True)
 
     daily_goal = models.IntegerField(null=True, verbose_name="Daily Goal", help_text="set a daily goal you want to reach", blank=True)
     UNITS = [

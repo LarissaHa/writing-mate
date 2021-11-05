@@ -68,18 +68,21 @@ created at {{ project.created_at }}
                                         aria-valuemax="100"></div>
                                 </div>
                             </div>
+                            <div class="col-auto">
+                                {{ count_today }} {{ project.unit }} written today
+                            </div>
                             {% endif %}
                         </div>
                         {% if goals %}
                         <br>
                         <div class="text-xs font-weight-bold text-uppercase mb-1" style="color:{{ project.color }} !important" >Goals</div>
                         <div class="col-auto">
-                            <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ goals.daily_goal }} per day</div>
+                            <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ goals.daily_goal }} {{ project.unit }} per day</div>
                         </div>
                         {% if goals.weekly_goal %}
-                        <div class="col-auto">
+                        <!--div class="col-auto">
                             <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ goals.weekly_goal }} per week</div>
-                        </div>
+                        </div-->
                         {% else %}{% endif %}
                         until {{ project.deadline }}
                         {% else %}{% endif %}

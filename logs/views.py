@@ -299,18 +299,25 @@ def projects(request, key=None):
 def calc_goals(user, project):
     if project.deadline is not None and project.deadline > date.today():
         x = 1
-        count_today = Log.objects.filter(project=project, user=user, date__lt=date.today()).aggregate(Sum('count'))["count__sum"]
+        count_without_today = Log.objects.filter(project=project, user=user, date__lt=date.today()).aggregate(Sum('count'))["count__sum"]
+        print(count_without_today)
         count_update = Log.objects.filter(project=project, user=user, is_update=True).aggregate(Sum('count'))["count__sum"]
+        print(count_update)
         count = (
-            (0 if count_today is None else count_today)
+            (0 if count_without_today is None else count_without_today)
             + (0 if count_update is None else count_update)
         )
+        print(count)
         logs_today = Log.objects.filter(project=project, user=user, date=timezone.localtime(timezone.now()), is_update=False)
+        print(logs_today)
         if len(logs_today) <= 0:
             x = x - 1
         todo = project.goal - count
+        print(todo)
         difference = project.deadline - timezone.localtime(timezone.now()).date()
-        daily_goal = round(todo / difference.days)
+        print(difference.days)
+        daily_goal = round(todo / (difference.days+1))
+        print(daily_goal)
         if ((difference.days+x) / 7) >=1:
             weekly_goal = round(todo / (difference.days / 7))
         else:
@@ -434,7 +441,7 @@ def home_stats(request):
     total_logs = logs.count()
     metrics = {"written_on_days": written_on_days, "total_count": total_count, "total_logs": total_logs}
 
-    count_today = Log.objects.filter(user=request.user, date=date.today()).aggregate(Sum('count'))["count__sum"]
+    count_today = Log.objects.filter(user=request.user, date=date.today(), is_update=False).aggregate(Sum('count'))["count__sum"]
     profile = Profile.objects.filter(user=request.user)
     personal_goal = None
     goal_unit = None
@@ -502,8 +509,9 @@ def stats(request, mode="days"):
                 if s["level"] == t["level"].strftime("%d"):
                     s["total_count"] = t["total_count"]
     start_datime
-    logs = Log.objects.filter(user=request.user, is_update=False, date__gt=start_datime).extra(select={'level': 'date(date)'}).values('level')
+    logs = Log.objects.filter(user=request.user, is_update=False, date__gt=start_datime).extra(select={'level': 'date(date)'}).values('level', 'project')
     written_on_days = len(logs.distinct())
+    #enriched_logs = [l for l in logs]
     total_count = sum([l["total_count"] for l in logs.annotate(total_count=Sum('count'))])
     total_logs = logs.count()
     metrics = {"written_on_days": written_on_days, "total_count": total_count, "total_logs": total_logs}
