@@ -300,24 +300,17 @@ def calc_goals(user, project):
     if project.deadline is not None and project.deadline > date.today():
         x = 1
         count_without_today = Log.objects.filter(project=project, user=user, date__lt=date.today()).aggregate(Sum('count'))["count__sum"]
-        print(count_without_today)
         count_update = Log.objects.filter(project=project, user=user, is_update=True).aggregate(Sum('count'))["count__sum"]
-        print(count_update)
         count = (
             (0 if count_without_today is None else count_without_today)
             + (0 if count_update is None else count_update)
         )
-        print(count)
         logs_today = Log.objects.filter(project=project, user=user, date=timezone.localtime(timezone.now()), is_update=False)
-        print(logs_today)
         if len(logs_today) <= 0:
             x = x - 1
         todo = project.goal - count
-        print(todo)
         difference = project.deadline - timezone.localtime(timezone.now()).date()
-        print(difference.days)
         daily_goal = round(todo / (difference.days+1))
-        print(daily_goal)
         if ((difference.days+x) / 7) >=1:
             weekly_goal = round(todo / (difference.days / 7))
         else:
@@ -633,7 +626,8 @@ def profile_view(request, user=None):
         if created is True:
             return redirect(f'/profile/{user_name}/')
         temp = Project.objects.filter(user=request.user).order_by("priority", "-created_at")
-    projects = deal_with_projects(temp, request.user)
+        looking_for = request.user
+    projects = deal_with_projects(temp, looking_for)
     profile_pic = get_profile_image(request.user)
     profile_color = profile.color
     if profile_color == "" or profile_color is None:
