@@ -25,3 +25,4 @@ tzlocal==2.1
 zipp==3.4.0
 django-crispy-forms
 Pillow
+encodings
