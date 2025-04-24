@@ -25,3 +25,4 @@ tzlocal
 zipp
 django-crispy-forms
 Pillow
+crispy-bootstrap4
