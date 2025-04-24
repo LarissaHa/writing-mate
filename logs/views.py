@@ -82,7 +82,7 @@ def chart(data, goal=None):
 
     plot = figure(
         x_range=FactorRange(*x),
-        plot_height=250,
+        outer_height=250,
         title="your progress",
         toolbar_location="below",
         tools="pan,wheel_zoom,box_zoom,reset"
